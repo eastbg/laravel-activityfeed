@@ -15,7 +15,6 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'laravel-activityfeed');
-
         $this->publishConfig();
 
         // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-activityfeed');

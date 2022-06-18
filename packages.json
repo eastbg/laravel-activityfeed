@@ -1,0 +1,9 @@
+{
+    "name": "east/laravel-activityfeed",
+    "version": "0.1",
+    "dist": {
+        "url": "https://github.com/eastbg/laravel-activityfeed"",
+        "type": "composer"
+    }
+}
+
