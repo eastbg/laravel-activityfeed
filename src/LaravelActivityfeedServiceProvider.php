@@ -17,8 +17,8 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'laravel-activityfeed');
         $this->publishConfig();
 
-        // $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-activityfeed');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-activityfeed');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->registerRoutes();
     }
 

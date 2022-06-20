@@ -11,7 +11,7 @@ class Notify extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'af:notify';
 
     /**
      * The console command description.
@@ -37,6 +37,6 @@ class Notify extends Command
      */
     public function handle()
     {
-        //
+        echo('here');
     }
 }
