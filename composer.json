@@ -47,11 +47,16 @@
     "extra": {
         "laravel": {
             "providers": [
-                "East\\LaravelActivityfeed\\LaravelActivityfeedServiceProvider"
+              "LaravelActivityfeedServiceProvider"
             ],
             "aliases": {
-                "East": "East\\LaravelActivityfeed\\LaravelActivityfeedFacade"
+                "East": "Feed"
             }
         }
-    }
+    },
+    "post-update-cmd": [
+        "php artisan clear-compiled",
+        "php artisan optimize",
+        "php artisan asset:publish east/laravel-activityfeed"
+    ]
 }

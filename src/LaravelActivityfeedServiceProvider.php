@@ -2,11 +2,21 @@
 
 namespace East\LaravelActivityfeed;
 
+use App\Models\Email\Emailer;
+use East\LaravelActivityfeed\Console\Commands\Notify;
+use East\LaravelActivityfeed\Facades\AfRules;
+use East\LaravelActivityfeed\Facades\AfTriggger;
+use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
+use East\LaravelActivityfeed\Models\ActivityFeedModel;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Jenssegers\Agent\Agent;
 
 class LaravelActivityfeedServiceProvider extends ServiceProvider
 {
+
+    protected $defer = true;
+
     /**
      * Bootstrap any application services.
      *
@@ -14,11 +24,23 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'laravel-activityfeed');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                Notify::class,
+            ]);
+        }
+
+        $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'af_feed');
         $this->publishConfig();
 
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'laravel-activityfeed');
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'af_feed');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+
+        $this->publishes([
+            __DIR__ . '/resources/css/af.css' => resource_path('css/af.css'),
+        ], 'asset');
+
         // $this->registerRoutes();
     }
 
@@ -56,9 +78,24 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     public function register()
     {
         // Register facade
-        $this->app->singleton('laravel-activityfeed', function () {
-            return new LaravelActivityfeed;
+        $this->app->singleton(ActivityFeed::class, function () {
+            return new ActivityFeed();
         });
+
+        $this->app->singleton(\East\LaravelActivityfeed\AfTriggger::class, function () {
+            return new \East\LaravelActivityfeed\AfTriggger();
+        });
+
+        $this->app->alias('ActivityFeed', ActivityFeed::class);
+
+        $this->app->bind('af-trigger', function () {
+            return new \East\LaravelActivityfeed\AfTriggger();
+        });
+
+        $this->app->alias('AfTrigger', "\East\LaravelActivityfeed\Facades\AfTriggger");
+        $this->app->bind('af-rules', \East\LaravelActivityfeed\AfRules::class);
+
+
     }
 
     /**
@@ -73,5 +110,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/LaravelActivityfeed.php' => config_path('LaravelActivityfeed.php'),
             ], 'config');
         }
+
+
     }
 }

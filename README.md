@@ -14,7 +14,16 @@ composer require east/laravel-activityfeed
 
 ## Usage
 
-Write a few lines about the usage of this package.
+### Recording events
+
+### Templating
+
+### Template parameters
+
+### Rules
+
+###
+
 
 
 ## Testing

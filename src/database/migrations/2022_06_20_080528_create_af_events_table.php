@@ -15,7 +15,14 @@ class CreateAfEventsTable extends Migration
     {
         Schema::create('af_events', function (Blueprint $table) {
             $table->id();
+            $table->id('id_user');
+            $table->id('id_template');
+            $table->id('id_rule');
+            $table->string('subject');
+            $table->text('text');
+
             $table->timestamps();
+
         });
     }
 

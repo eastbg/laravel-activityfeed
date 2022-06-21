@@ -1,11 +1,12 @@
 <?php
 
-namespace East\LaravelActivityfeed;
+namespace East\LaravelActivityfeed\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-class LaravelActivityfeedFacade extends Facade
-{
+class AfTriggger extends Facade {
+
+
     /**
      * Get the registered name of the component.
      *
@@ -13,6 +14,9 @@ class LaravelActivityfeedFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'laravel-activityfeed';
+        return 'af-trigger';
     }
+
+
+
 }
