@@ -29,7 +29,7 @@ class AfRulesCrudController extends CrudController
     {
         CRUD::setModel(AfRulesModel::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/af-rules');
-        CRUD::setEntityNameStrings('af rules', 'af rules');
+        CRUD::setEntityNameStrings('Rule', 'Rules');
     }
 
     /**

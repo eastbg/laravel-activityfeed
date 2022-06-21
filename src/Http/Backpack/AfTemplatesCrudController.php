@@ -32,8 +32,8 @@ class AfTemplatesCrudController extends CrudController
     public function setup()
     {
         CRUD::setModel(AfTemplatesModel::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/af-rules');
-        CRUD::setEntityNameStrings('af rules', 'af rules');
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/af-templates');
+        CRUD::setEntityNameStrings('Template', 'Templates');
     }
 
     /**

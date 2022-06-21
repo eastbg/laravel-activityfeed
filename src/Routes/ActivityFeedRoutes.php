@@ -7,5 +7,8 @@ Route::group([
     'middleware' => ['web','admin'],
     'namespace' => 'East\LaravelActivityfeed\Http\Backpack',
 ], function () { // custom admin routes
+    Route::crud('af-categories', 'AfCategoriesCrudController');
+    Route::crud('af-events', 'AfEventsCrudController');
     Route::crud('af-rules', 'AfRulesCrudController');
+    Route::crud('af-templates', 'AfTemplatesCrudController');
 }); // this should be the absolute last line of this file

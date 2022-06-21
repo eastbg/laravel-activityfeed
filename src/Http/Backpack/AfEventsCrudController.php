@@ -34,8 +34,8 @@ class AfEventsCrudController extends CrudController
     public function setup()
     {
         CRUD::setModel(AfEventsModel::class);
-        CRUD::setRoute(config('backpack.base.route_prefix') . '/af-rules');
-        CRUD::setEntityNameStrings('af rules', 'af rules');
+        CRUD::setRoute(config('backpack.base.route_prefix') . '/af-events');
+        CRUD::setEntityNameStrings('Event', 'Events');
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Artisan;
 
 class Install extends Command
 {
@@ -37,6 +38,9 @@ class Install extends Command
      */
     public function handle()
     {
-        echo('here');
+        $sidebar = file_get_contents('vendor/east/laravel-activityfeed/src/Resources/views/sidemenu.blade.php');
+        Artisan::call('backpack:add-sidebar-content',['code' => $sidebar]);
+
+
     }
 }

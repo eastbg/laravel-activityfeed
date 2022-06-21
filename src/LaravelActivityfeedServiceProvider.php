@@ -43,6 +43,14 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             __DIR__ . '/Resources/css/af.css' => resource_path('css/af.css'),
         ], 'asset');
 
+        $this->publishes([
+            __DIR__ . '/Resources/js/af.js' => public_path('js/af.js'),
+        ], 'asset');
+
+        $this->publishes([
+            __DIR__ . '/Resources/views/backpack/widgets/js.blade.php' => resource_path('views/vendor/backpack/base/widgets/js.blade.php'),
+        ], 'asset');
+
         $this->registerRoutes();
     }
 
@@ -94,14 +102,6 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         $this->app->singleton(AfCaching::class, function () {
             return new AfCaching();
         });
-
-/*        $this->app->bind('af-render', function () {
-            return new \East\LaravelActivityfeed\Actions\AfRenderActions();
-        });*/
-
-        //$this->app->alias('AfRender', "\East\LaravelActivityfeed\Facades\AfRender");
-
-
 
     }
 
