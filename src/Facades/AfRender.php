@@ -2,20 +2,21 @@
 
 namespace East\LaravelActivityfeed\Facades;
 
+use East\LaravelActivityfeed\Actions\AfRenderActions;
 use East\LaravelActivityfeed\Actions\AfTriggerActions;
 use Illuminate\Support\Facades\Facade;
 
 
 /**
- * Class AfRules
+ * Class AfRender
  *
- * @method static AfTriggerActions setUser(int $id)
+ * @method static AfRenderActions setUser(int $id)
+ * @method static AfRenderActions getFeed()
  *
  * @package App\Facades
  */
 
-class AfTriggger extends Facade {
-
+class AfRender extends Facade {
 
     /**
      * Get the registered name of the component.
@@ -24,7 +25,7 @@ class AfTriggger extends Facade {
      */
     protected static function getFacadeAccessor()
     {
-        return 'af-trigger';
+        return 'af-render';
     }
 
 

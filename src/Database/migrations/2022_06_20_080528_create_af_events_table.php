@@ -1,0 +1,63 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateAfEventsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('af_events', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+
+            $table->bigInteger('id_user')->nullable()->unsigned();
+
+            $table->bigInteger('id_user_recipient')->nullable()->unsigned();
+            $table->bigInteger('id_user_creator')->nullable()->unsigned();
+
+            $table->bigInteger('id_template')->nullable()->unsigned();
+            $table->bigInteger('id_rule')->nullable()->unsigned();
+            $table->bigInteger('id_category')->nullable()->unsigned();
+
+            $table->string('related_table');
+            $table->bigInteger('foreign_key')->nullable()->unsigned();;
+
+            $table->string('notification_subject');
+            $table->text('notification_template');
+
+            $table->string('email_subject');
+            $table->text('email_template');
+
+            $table->string('digest_subject');
+            $table->text('digest_template');
+
+            $table->string('admin_subject');
+            $table->text('admin_template');
+
+            $table->dateTime('expiry');
+
+            $table->tinyInteger('read')->default(0);
+            $table->tinyInteger('sent')->default(0);
+
+            $table->tinyInteger('digest')->default(0);
+            $table->tinyInteger('digested')->default(0);
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::dropIfExists('af_events');
+    }
+}

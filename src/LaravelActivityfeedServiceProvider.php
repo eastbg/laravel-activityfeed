@@ -2,15 +2,14 @@
 
 namespace East\LaravelActivityfeed;
 
-use App\Models\Email\Emailer;
+use East\LaravelActivityfeed\Actions\AfTriggerActions;
+use East\LaravelActivityfeed\Console\Commands\Cache;
+use East\LaravelActivityfeed\Console\Commands\Generator;
+use East\LaravelActivityfeed\Console\Commands\Install;
 use East\LaravelActivityfeed\Console\Commands\Notify;
-use East\LaravelActivityfeed\Facades\AfRules;
-use East\LaravelActivityfeed\Facades\AfTriggger;
-use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
-use East\LaravelActivityfeed\Models\ActivityFeedModel;
-use Illuminate\Support\ServiceProvider;
+use East\LaravelActivityfeed\Models\Helpers\AfCaching;
 use Illuminate\Support\Facades\Route;
-use Jenssegers\Agent\Agent;
+use Illuminate\Support\ServiceProvider;
 
 class LaravelActivityfeedServiceProvider extends ServiceProvider
 {
@@ -28,20 +27,23 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Notify::class,
+                Install::class,
+                Generator::class,
+                Cache::class,
             ]);
         }
 
         $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'af_feed');
         $this->publishConfig();
 
-        $this->loadViewsFrom(__DIR__.'/resources/views', 'af_feed');
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadViewsFrom(__DIR__.'/Resources/views', 'af_feed');
+        $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
 
         $this->publishes([
-            __DIR__ . '/resources/css/af.css' => resource_path('css/af.css'),
+            __DIR__ . '/Resources/css/af.css' => resource_path('css/af.css'),
         ], 'asset');
 
-        // $this->registerRoutes();
+        $this->registerRoutes();
     }
 
     /**
@@ -52,7 +54,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     private function registerRoutes()
     {
         Route::group($this->routeConfiguration(), function () {
-            $this->loadRoutesFrom(__DIR__ . '/Http/routes.php');
+            $this->loadRoutesFrom(__DIR__ . '/Routes/ActivityFeedRoutes.php');
         });
     }
 
@@ -64,9 +66,9 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     private function routeConfiguration()
     {
         return [
-            'namespace'  => "East\LaravelActivityfeed\Http\Controllers",
-            'middleware' => 'api',
-            'prefix'     => 'api'
+/*            'namespace'  => "East\LaravelActivityfeed\Http\Backpack",
+            'middleware' => 'admin',
+            'prefix'     => config('backpack.base.route_prefix', 'admin'),*/
         ];
     }
 
@@ -78,22 +80,27 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     public function register()
     {
         // Register facade
-        $this->app->singleton(ActivityFeed::class, function () {
-            return new ActivityFeed();
-        });
-
-        $this->app->singleton(\East\LaravelActivityfeed\AfTriggger::class, function () {
-            return new \East\LaravelActivityfeed\AfTriggger();
-        });
-
-        $this->app->alias('ActivityFeed', ActivityFeed::class);
 
         $this->app->bind('af-trigger', function () {
-            return new \East\LaravelActivityfeed\AfTriggger();
+            return new AfTriggerActions();
         });
 
         $this->app->alias('AfTrigger', "\East\LaravelActivityfeed\Facades\AfTriggger");
-        $this->app->bind('af-rules', \East\LaravelActivityfeed\AfRules::class);
+
+        $this->app->bind('af-render', function () {
+            return new \East\LaravelActivityfeed\Actions\AfRenderActions();
+        });
+
+        $this->app->singleton(AfCaching::class, function () {
+            return new AfCaching();
+        });
+
+/*        $this->app->bind('af-render', function () {
+            return new \East\LaravelActivityfeed\Actions\AfRenderActions();
+        });*/
+
+        //$this->app->alias('AfRender', "\East\LaravelActivityfeed\Facades\AfRender");
+
 
 
     }
