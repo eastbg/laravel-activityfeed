@@ -3,11 +3,13 @@
 namespace East\LaravelActivityfeed;
 
 use East\LaravelActivityfeed\Actions\AfTriggerActions;
+use East\LaravelActivityfeed\Console\Commands\AfPoll;
 use East\LaravelActivityfeed\Console\Commands\Cache;
 use East\LaravelActivityfeed\Console\Commands\Generator;
 use East\LaravelActivityfeed\Console\Commands\Install;
 use East\LaravelActivityfeed\Console\Commands\Notify;
 use East\LaravelActivityfeed\Models\Helpers\AfCaching;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -30,6 +32,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
                 Install::class,
                 Generator::class,
                 Cache::class,
+                AfPoll::class,
             ]);
         }
 
@@ -55,7 +58,17 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             __DIR__ . '/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
         ], 'asset');
 
+        $this->publishes([
+            __DIR__ . '/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channel/Email.php'),
+        ], 'asset');
+
         $this->registerRoutes();
+
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('afpoll:run')->everyMinute();
+        });
+
     }
 
     /**

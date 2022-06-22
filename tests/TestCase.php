@@ -4,19 +4,20 @@ namespace East\LaravelActivityfeed\Tests;
 
 use East\LaravelActivityfeed\LaravelActivityfeedServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Tests\UnitTestCase;
 
-class TestCase extends BaseTestCase
+class TestCase extends \PHPUnit\Framework\TestCase
 {
     public function setup() : void
     {
         parent::setUp();
-        $this->withoutExceptionHandling();
+/*        $this->withoutExceptionHandling();
         $this->artisan('migrate', ['--database' => 'testing']);
 
         $this->loadMigrationsFrom(__DIR__ . '/../src/Database/migrations');
         $this->loadLaravelMigrations(['--database' => 'testing']);
 
-        $this->withFactories(__DIR__ . '/../src/Database/factories');
+        $this->withFactories(__DIR__ . '/../src/Database/factories');*/
     }
 
     protected function getEnvironmentSetUp($app)

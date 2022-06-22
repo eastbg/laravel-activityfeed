@@ -44,6 +44,10 @@ class AfNotifications extends Migration
             $table->tinyInteger('read')->default(0);
             $table->tinyInteger('digest')->default(0);
             $table->tinyInteger('digested')->default(0);
+
+            $table->tinyInteger('processed')->default(0);
+            $table->tinyInteger('popup')->default(0);
+
         });
 
     }

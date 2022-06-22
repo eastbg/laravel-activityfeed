@@ -1,9 +1,8 @@
 <?php
 
-namespace East\LaravelActivityfeed\Models\ActiveModels;
+namespace East\LaravelActivityfeed\Models;
 
 use Backpack\CRUD\app\Models\Traits\CrudTrait;
-use East\LaravelActivityfeed\Models\ActivityFeedModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;

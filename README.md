@@ -55,7 +55,13 @@ Rules are tied to events in particular database tables and include the following
    * Operator
    * Value
 
-In addition, you can create custom rules with PHP code. These go under app/ActivityFeed/Rules/. When you do install, an example rule will be put in place. 
+In addition, you can create custom rules with PHP code. These go under app/ActivityFeed/Rules/. When you do the install, an example rule will be put in place. 
+
+
+### Creators
+
+In addition to manually defined rules that take care of the saving, you can also use a custom save class - these are called creators. The creators go under app/ActivityFeed/Creators/. When you do the install, an example creator will be put in place.
+
 
 ### Targeting
 
@@ -73,6 +79,8 @@ Recipients (pivot)
       Users
 ```
 As pivot records don't exist when creating the Posts, we will save this event to be created as a notification by the cron job. The difficult part is on mapping the relationship chain.
+
+
 
 ### Templating
 
@@ -104,15 +112,15 @@ Template itself usually defines:
 As I'm lazy, I've used the excellent model generator from krlove. You can use it like this (adjust paths obviously):
 
 ```bash
-php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_events AfEventsModel
+php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_events AfEventsModel
 
-php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_rules AfRules
+php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_rules AfRules
 
-php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_categories AfCategories
+php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_categories AfCategories
 
-php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_templates AfTemplatesModel
+php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_templates AfTemplatesModel
 
-php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_notifications AfNotificationsModel
+php artisan krlove:generate:model --base-class-name='East\LaravelActivityfeed\Models\ActivityFeedBaseModel' --namespace='East\LaravelActivityfeed\Models\ActiveModels' --output-path=../vendor/east/laravel-activityfeed/src/Models/ActiveModels/ --table-name=af_notifications AfNotificationsModel
 ```
 
 ### Rendering
@@ -123,7 +131,27 @@ Include widgets
 
 Available widgets:
  * FeedWidget
- * 
+ * MenuWidget
+ * NotificationWidget
+
+
+### Understanding the flow
+
+```php
+    Model event
+        ↓
+    Check rules
+        ↓
+    Create event
+        ↓
+ Cronjob (afpoll:run)
+        ↓
+ Create notifications (uses mapping)
+        ↓
+Render and/or send notification
+```
+As pivot records don't exist when creating the Posts, we will save this event to be created as a notification by the cron job. The difficult part is on mapping the relationship chain.
+
 
 
 ## Testing

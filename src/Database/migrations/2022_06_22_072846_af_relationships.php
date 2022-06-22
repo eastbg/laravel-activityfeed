@@ -14,7 +14,6 @@ class AfRelationships extends Migration
     public function up()
     {
         Schema::table('af_events', function (Blueprint $table) {
-            $table->foreign('id_user_recipient')->references('id')->on('users')->onDelete('SET NULL');
             $table->foreign('id_user_creator')->references('id')->on('users')->onDelete('SET NULL');
             $table->foreign('id_template')->references('id')->on('af_templates')->onDelete('SET NULL');
             $table->foreign('id_rule')->references('id')->on('af_rules')->onDelete('SET NULL');
@@ -30,7 +29,18 @@ class AfRelationships extends Migration
             $table->foreign('id_template')->references('id')->on('af_templates')->onDelete('SET NULL');
         });
 
+        Schema::table('af_notifications', function (Blueprint $table) {
+            $table->foreign('id_user_recipient')->references('id')->on('users')->onDelete('SET NULL');
+            $table->foreign('id_user_creator')->references('id')->on('users')->onDelete('SET NULL');
+
+            $table->foreign('id_template')->references('id')->on('af_templates')->onDelete('SET NULL');
+            $table->foreign('id_rule')->references('id')->on('af_rules')->onDelete('SET NULL');
+            $table->foreign('id_category')->references('id')->on('af_categories')->onDelete('SET NULL');
+        });
+
+
     }
+
 
     /**
      * Reverse the migrations.

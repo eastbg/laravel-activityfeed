@@ -9,22 +9,17 @@ use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
  * @property string $created_at
  * @property string $updated_at
  * @property string $name
+ * @property string $icon
  * @property string $description
  * @property string $ui_placement
  * @property boolean $enabled
  * @property AfEvent[] $afEvents
+ * @property AfNotification[] $afNotifications
  * @property AfRule[] $afRules
  * @property AfTemplate[] $afTemplates
  */
-class AfCategoriesModel extends ActivityFeedBaseModel
+class AfCategories extends ActivityFeedBaseModel
 {
-    /**
-     * The table associated with the model.
-     * 
-     * @var string
-     */
-    protected $table = 'af_categories';
-
     /**
      * The "type" of the auto-incrementing ID.
      * 
@@ -35,7 +30,7 @@ class AfCategoriesModel extends ActivityFeedBaseModel
     /**
      * @var array
      */
-    protected $fillable = ['created_at', 'updated_at', 'name', 'description', 'ui_placement', 'enabled'];
+    protected $fillable = ['created_at', 'updated_at', 'name', 'icon', 'description', 'ui_placement', 'enabled'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
@@ -43,6 +38,14 @@ class AfCategoriesModel extends ActivityFeedBaseModel
     public function afEvents()
     {
         return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfEvent', 'id_category');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function afNotifications()
+    {
+        return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfNotification', 'id_category');
     }
 
     /**

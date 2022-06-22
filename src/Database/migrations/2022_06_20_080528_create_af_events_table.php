@@ -29,6 +29,13 @@ class CreateAfEventsTable extends Migration
             $table->tinyInteger('admins')->default(0);
             $table->tinyInteger('digest')->default(0);
             $table->tinyInteger('digested')->default(0);
+            $table->tinyInteger('to_admins')->default(0);
+            $table->tinyInteger('background_job')->default(0);
+            $table->tinyInteger('popup')->default(0);
+
+            $table->index([
+                'expiry','processed','admins','digest','digested'
+            ]);
         });
     }
 

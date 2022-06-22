@@ -20,6 +20,9 @@ class CreateAfRulesTable extends Migration
             $table->bigInteger('id_category')->nullable()->unsigned();
             $table->bigInteger('id_template')->nullable()->unsigned();
 
+            $table->string('rule_script');
+            $table->string('creator_script');
+
             $table->json('targeting');
             $table->json('channels');
 
@@ -38,9 +41,16 @@ class CreateAfRulesTable extends Migration
             $table->string('rule_actions');
             $table->string('context');
 
+            $table->tinyInteger('to_admins')->default(0);
             $table->tinyInteger('background_job')->default(0);
             $table->tinyInteger('digestible')->default(0);
             $table->tinyInteger('enabled')->default(0);
+            $table->tinyInteger('popup')->default(0);
+
+            $table->index([
+                'to_admins','background_job','digestible','enabled'
+            ]);
+
         });
     }
 

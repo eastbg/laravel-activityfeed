@@ -2,7 +2,7 @@
 
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
-use East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel;
+use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
 
 /**
  * @property integer $id
@@ -22,6 +22,7 @@ use East\LaravelActivityfeed\Models\ActiveModels\ActivityFeedBaseModel;
  * @property boolean $enabled
  * @property AfCategory $afCategory
  * @property AfEvent[] $afEvents
+ * @property AfNotification[] $afNotifications
  * @property AfRule[] $afRules
  */
 class AfTemplatesModel extends ActivityFeedBaseModel
@@ -59,6 +60,14 @@ class AfTemplatesModel extends ActivityFeedBaseModel
     public function afEvents()
     {
         return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfEvent', 'id_template');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function afNotifications()
+    {
+        return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfNotification', 'id_template');
     }
 
     /**
