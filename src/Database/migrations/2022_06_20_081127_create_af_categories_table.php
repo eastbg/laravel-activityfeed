@@ -18,6 +18,7 @@ class CreateAfCategoriesTable extends Migration
             $table->timestamps();
 
             $table->string('name');
+            $table->string('icon');
             $table->text('description');
             $table->string('ui_placement');
 

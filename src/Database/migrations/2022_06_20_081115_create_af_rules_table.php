@@ -20,6 +20,9 @@ class CreateAfRulesTable extends Migration
             $table->bigInteger('id_category')->nullable()->unsigned();
             $table->bigInteger('id_template')->nullable()->unsigned();
 
+            $table->json('targeting');
+            $table->json('channels');
+
             $table->string('name');
             $table->text('description');
 

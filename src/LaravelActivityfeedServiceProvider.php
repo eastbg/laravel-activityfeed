@@ -33,7 +33,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/LaravelActivityfeed.php', 'af_feed');
+        $this->mergeConfigFrom(__DIR__ . '/../config/activity-feed.php', 'af_feed');
         $this->publishConfig();
 
         $this->loadViewsFrom(__DIR__.'/Resources/views', 'af_feed');
@@ -49,6 +49,10 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
 
         $this->publishes([
             __DIR__ . '/Resources/views/backpack/widgets/js.blade.php' => resource_path('views/vendor/backpack/base/widgets/js.blade.php'),
+        ], 'asset');
+
+        $this->publishes([
+            __DIR__ . '/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
         ], 'asset');
 
         $this->registerRoutes();
@@ -114,10 +118,8 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/LaravelActivityfeed.php' => config_path('LaravelActivityfeed.php'),
+                __DIR__ . '/../config/activity-feed.php' => config_path('activity-feed.php'),
             ], 'config');
         }
-
-
     }
 }

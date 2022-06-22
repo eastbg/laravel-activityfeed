@@ -13,7 +13,6 @@ class AfRelationships extends Migration
      */
     public function up()
     {
-
         Schema::table('af_events', function (Blueprint $table) {
             $table->foreign('id_user_recipient')->references('id')->on('users')->onDelete('SET NULL');
             $table->foreign('id_user_creator')->references('id')->on('users')->onDelete('SET NULL');
