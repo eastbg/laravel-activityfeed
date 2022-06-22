@@ -1,3 +1,63 @@
+/*
+* Finds the database columns based on
+* */
+function updateSelectedTable(name){
+
+    let field = document.getElementById(name);
+
+    $.getJSON('/af-data/fields?table='+field.value, function(data) {
+        var options = "";
+
+        $.each(data, function (key, val) {
+            options = options + "<option>" + val + "</option>";
+        });
+
+        $('select#field_name').html(options);
+    });
+}
+
+
+/*
+    let field = document.getElementById(name);
+
+    var options = [
+        {text: "one", value: 1},
+        {text: "two", value: 2}
+    ];
+
+    $("#field_name").replaceOptions(options);
+*/
+
+/*
+    $.getJSON('/af-data/fields?table='+field.value, function(data) {
+
+        var options = "";
+        //$("#field_name").empty();
+
+        $.each(data, function(key, val){
+            options = options+"<option>"+val+"</option>";
+
+            var option = $('<option></option>').attr(key, val).text(val);
+            $("#field_name").append(option);
+
+        });
+
+        $('select#field_name').html(options);
+
+
+        $("#field_name").empty().append(options);
+
+        $('select#field_name').html(options);
+        });
+*/
+
+
+
+
+
+
+/*
+
 const dateUpdated = function(){
     // update the last
 
@@ -28,7 +88,7 @@ const changeDate = function() {
             wrapper.style.display = "block";
             numberOfDaysToAdd = 14;
             return true;
-        /*
+        /!*
                         case 'Available in 7 days after confirmation':
                             wrapper.style.display = "none";
                             numberOfDaysToAdd = 10;
@@ -49,7 +109,7 @@ const changeDate = function() {
                             wrapper.style.display = "none";
                             numberOfDaysToAdd = 356;
                             return true;
-        */
+        *!/
     }
 
     wrapper.style.display = "none";
@@ -57,4 +117,4 @@ const changeDate = function() {
     element.value = value;
     element_passer.value = value;
     return true;
-}
+}*/

@@ -27,7 +27,7 @@ class ActivityFeedBaseModel extends Model
 
 
 
-        echo($this->getTable());die();
+        //echo($this->getTable());die();
 
 
         parent::save();

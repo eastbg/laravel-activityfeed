@@ -6,6 +6,8 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategoriesModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRulesModel;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplates;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplatesModel;
 use East\LaravelActivityfeed\Requests\AfCategoriesRequest;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
@@ -23,6 +25,8 @@ class AfTemplatesCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -31,10 +35,16 @@ class AfTemplatesCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(AfTemplatesModel::class);
+        CRUD::setModel(AfTemplate::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/af-templates');
         CRUD::setEntityNameStrings('Template', 'Templates');
     }
+
+    public function fetchTemplate()
+    {
+        return $this->fetch(AfTemplate::class);
+    }
+
 
     /**
      * Define what happens when the List operation is loaded.

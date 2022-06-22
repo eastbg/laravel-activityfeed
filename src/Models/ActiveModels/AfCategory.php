@@ -18,7 +18,7 @@ use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
  * @property AfRule[] $afRules
  * @property AfTemplate[] $afTemplates
  */
-class AfCategories extends ActivityFeedBaseModel
+class AfCategory extends ActivityFeedBaseModel
 {
     /**
      * The "type" of the auto-incrementing ID.

@@ -2,9 +2,9 @@
 
 namespace App\ActivityFeed\Rules;
 
-use East\LaravelActivityfeed\ActivityFeed\Rules\CreatorBase;
+use East\LaravelActivityfeed\ActivityFeed\Rules\RuleBase;
 
-class CreatorPost extends CreatorBase {
+class RulePost extends RuleBase {
 
     public $type = 'cron';
 

@@ -6,7 +6,9 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\CRUD\app\Library\Widget;
 use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
+use East\LaravelActivityfeed\Models\ActiveModels\AfCategories;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategoriesModel;
+use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRulesModel;
 use East\LaravelActivityfeed\Requests\AfCategoriesRequest;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
@@ -23,6 +25,8 @@ class AfCategoriesCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     use CloneOperation;
 
@@ -33,12 +37,16 @@ class AfCategoriesCrudController extends CrudController
      */
     public function setup()
     {
-
-
-        CRUD::setModel(AfCategoriesModel::class);
+        CRUD::setModel(AfCategory::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/af-categories');
         CRUD::setEntityNameStrings('Category', 'Categories');
     }
+
+    public function fetchCategory()
+    {
+        return $this->fetch(AfCategory::class);
+    }
+
 
     /**
      * Define what happens when the List operation is loaded.
@@ -50,8 +58,9 @@ class AfCategoriesCrudController extends CrudController
     {
         CRUD::column('name');
         CRUD::column('description');
-        CRUD::column('enabled');
+        CRUD::column('enabled')->type('checkbox');
         CRUD::column('ui_placement');
+        CRUD::column('icon');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -68,15 +77,15 @@ class AfCategoriesCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
-        CRUD::setValidation(AfCategoriesRequest::class);
+        //CRUD::setValidation(AfCategoriesRequest::class);
 
         CRUD::field('name');
         CRUD::field('description');
         CRUD::field('enabled');
         CRUD::field('ui_placement')->type('checkbox');
 
-        Widget::add()->type('script')
-            ->content('/public/js/af.js');
+/*        Widget::add()->type('script')
+            ->content('/public/js/af.js');*/
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

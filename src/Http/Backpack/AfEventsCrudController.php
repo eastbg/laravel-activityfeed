@@ -5,6 +5,8 @@ namespace East\LaravelActivityfeed\Http\Backpack;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategoriesModel;
+use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
+use East\LaravelActivityfeed\Models\ActiveModels\AfEvents;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEventsModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRulesModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplatesModel;
@@ -25,6 +27,8 @@ class AfEventsCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
+    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -33,7 +37,7 @@ class AfEventsCrudController extends CrudController
      */
     public function setup()
     {
-        CRUD::setModel(AfEventsModel::class);
+        CRUD::setModel(AfEvent::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/af-events');
         CRUD::setEntityNameStrings('Event', 'Events');
     }

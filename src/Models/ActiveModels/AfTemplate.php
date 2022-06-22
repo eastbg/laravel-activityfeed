@@ -25,7 +25,7 @@ use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
  * @property AfNotification[] $afNotifications
  * @property AfRule[] $afRules
  */
-class AfTemplatesModel extends ActivityFeedBaseModel
+class AfTemplate extends ActivityFeedBaseModel
 {
     /**
      * The table associated with the model.

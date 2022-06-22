@@ -9,6 +9,7 @@ use East\LaravelActivityfeed\Console\Commands\Generator;
 use East\LaravelActivityfeed\Console\Commands\Install;
 use East\LaravelActivityfeed\Console\Commands\Notify;
 use East\LaravelActivityfeed\Models\Helpers\AfCaching;
+use East\LaravelActivityfeed\Models\Helpers\AfData;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -55,11 +56,15 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         ], 'asset');
 
         $this->publishes([
-            __DIR__ . '/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
+            __DIR__ . '/ActivityFeed/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
         ], 'asset');
 
         $this->publishes([
-            __DIR__ . '/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channel/Email.php'),
+            __DIR__ . '/ActivityFeed/Creators/CreatorTemplate.php' => app_path('ActivityFeed/Creators/TeamToUser.php'),
+        ], 'asset');
+
+        $this->publishes([
+            __DIR__ . '/ActivityFeed/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channels/Email.php'),
         ], 'asset');
 
         $this->registerRoutes();
@@ -116,8 +121,16 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             return new \East\LaravelActivityfeed\Actions\AfRenderActions();
         });
 
+        $this->app->bind('af-helper', function () {
+            return new AfData();
+        });
+
         $this->app->singleton(AfCaching::class, function () {
             return new AfCaching();
+        });
+
+        $this->app->singleton(AfData::class, function () {
+            return new AfData();
         });
 
     }
