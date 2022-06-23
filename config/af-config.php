@@ -11,4 +11,5 @@ return [
     'af_tables' => [], // if you want to limit database tables for ruling
     'af_exclude_tables' => ['languages', 'sessions'], // you can exclude certain tables
     'af_model_path' => 'App\Models\Zoho\Modules\Models',
+    'repeat_events_grace' => 1440,  // don't create similar events within the grace period
 ];

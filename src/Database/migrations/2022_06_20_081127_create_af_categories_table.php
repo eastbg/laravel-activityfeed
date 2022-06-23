@@ -17,10 +17,10 @@ class CreateAfCategoriesTable extends Migration
             $table->id();
             $table->timestamps();
 
-            $table->string('name');
-            $table->string('icon');
-            $table->text('description');
-            $table->string('ui_placement');
+            $table->string('name')->nullable();
+            $table->string('icon')->nullable();
+            $table->text('description')->nullable();
+            $table->string('ui_placement')->nullable();
 
             $table->tinyInteger('enabled')->default(0);
         });

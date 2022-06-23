@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Actions;
 
 use App\Models\Email\Emailer;
+use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\Helpers\AfCaching;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,8 +30,14 @@ class AfRenderActions extends Model
         parent::__construct($attributes);
     }
 
-    public function getFeed(){
-        return view('af_feed::components.feed',['random' => $this->cache->random.' - '.$this->id_user]);
+    public function getFeed() : string {
+        if(!$this->id_user) { $this->id_user = auth()->user()->id; } if(!$this->id_user){ return ''; }
+
+        $feed = AfNotification::where('id_user_recipient','=',$this->id_user)->with([
+            'AfRule','recipient','creator','AfRule.AfTemplate'
+        ])->get();
+
+        return view('af_feed::components.feed',['feed' => $feed]);
     }
 
     public function setUser($id){

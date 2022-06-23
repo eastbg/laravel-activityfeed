@@ -3,34 +3,20 @@
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
 use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
+use Illuminate\Foundation\Auth\User;
 
 /**
  * @property integer $id
  * @property integer $id_user_recipient
  * @property integer $id_user_creator
- * @property integer $id_template
  * @property integer $id_rule
- * @property integer $id_category
  * @property string $created_at
  * @property string $updated_at
- * @property mixed $channels
- * @property string $notification_subject
- * @property string $notification_template
- * @property string $email_subject
- * @property string $email_template
- * @property string $digest_subject
- * @property string $digest_template
- * @property string $admin_subject
- * @property string $admin_template
  * @property string $expiry
  * @property boolean $sent
  * @property boolean $read
- * @property boolean $digest
  * @property boolean $digested
  * @property boolean $processed
- * @property boolean $popup
- * @property AfCategory $afCategory
- * @property AfTemplate $afTemplate
  * @property User $creator
  * @property AfRule $afRule
  * @property User $recipient
@@ -59,25 +45,9 @@ class AfNotification extends ActivityFeedBaseModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function afCategory()
-    {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfCategory', 'id_category');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function afTemplate()
-    {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfTemplate', 'id_template');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function recipient()
     {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\User', 'id_user_recipient');
+        return $this->belongsTo(User::class, 'id_user_recipient');
     }
 
     /**
@@ -93,6 +63,6 @@ class AfNotification extends ActivityFeedBaseModel
      */
     public function creator()
     {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\User', 'id_user_creator');
+        return $this->belongsTo(User::class, 'id_user_creator');
     }
 }

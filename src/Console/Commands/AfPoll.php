@@ -2,6 +2,7 @@
 
 namespace East\LaravelActivityfeed\Console\Commands;
 
+use East\LaravelActivityfeed\Actions\AfPollAction;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Artisan;
@@ -39,6 +40,9 @@ class AfPoll extends Command
      */
     public function handle()
     {
+
+        $obj = new AfPollAction();
+        $obj->runPoll();
 
     }
 }

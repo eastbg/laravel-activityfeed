@@ -19,20 +19,20 @@ class CreateAfTemplatesTable extends Migration
 
             $table->bigInteger('id_category')->nullable()->unsigned();
 
-            $table->string('name');
-            $table->text('description');
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
 
-            $table->string('notification_subject');
-            $table->text('notification_template');
+            $table->string('notification_subject')->nullable();
+            $table->text('notification_template')->nullable();
 
-            $table->string('email_subject');
-            $table->text('email_template');
+            $table->string('email_subject')->nullable();
+            $table->text('email_template')->nullable();
 
-            $table->string('digest_subject');
-            $table->text('digest_template');
+            $table->string('digest_subject')->nullable();
+            $table->text('digest_template')->nullable();
 
-            $table->string('admin_subject');
-            $table->text('admin_template');
+            $table->string('admin_subject')->nullable();
+            $table->text('admin_template')->nullable();
 
             $table->tinyInteger('enabled')->default(0);
         });

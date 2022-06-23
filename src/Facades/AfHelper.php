@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static AfData getChannels()
  * @method static AfData getRuleScripts()
  * @method static AfData getRuleOperators()
+ * @method static AfData flushCaches()
+ * @method static AfData getRules()
+ * @method static AfData getTableRules($table,$rule_type)
  *
  * @package App\Facades
  */

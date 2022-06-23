@@ -14,7 +14,7 @@ class AfData extends Model
     use HasFactory;
 
     public static $caches = [
-
+        'af_rules'
     ];
 
     public $random;
@@ -31,12 +31,47 @@ class AfData extends Model
         }
     }
 
+    public function getTableRules(string $table,string $rule_type) : array{
+        $rules = $this->getRules();
+        if(isset($rules[$table][$rule_type])){
+            return $rules[$table][$rule_type];
+        }
+
+        return [];
+    }
+
+    public function getRules() : array {
+        $cache = Cache::get('af_rules');
+
+        if($cache){
+            return $cache;
+        }
+
+        return $this->makeRules();
+    }
+
+    private function makeRules() : array{
+
+        $rules = AfRule::all();
+        $output = [];
+
+        foreach($rules as $rule){
+            if(!$rule->table_name){ continue; }
+            if(!$rule->rule_type){ continue; }
+            if(!$rule->enabled){ continue; }
+            $output[$rule->table_name][$rule->rule_type][] = $rule;
+        }
+
+        Cache::set('af_rules',$output);
+        return $output;
+    }
+
     public function getTables(): array
     {
         $tables = DB::select('SHOW TABLES');
         $output = [];
-        $include = config('activity-feed.af_tables') ?? [];
-        $exclude = config('activity-feed.af_exclude_tables') ?? [];
+        $include = config('af-config.af_tables') ?? [];
+        $exclude = config('af-config.af_exclude_tables') ?? [];
 
         foreach ($tables as $key => $table) {
 
@@ -74,13 +109,13 @@ class AfData extends Model
 
     public function getRelationships(string $table): array
     {
-        $class = config('activity-feed.af_model_path') . '\\' . $table;
+        $class = config('af-config.af_model_path') . '\\' . $table;
         $reflector = new \ReflectionClass($class);
         $output = [];
         $exclude = ['booted', 'save', 'delete', 'update'];
 
         foreach ($reflector->getMethods() as $method) {
-            if (stristr($method->class, config('activity-feed.af_model_path'))) {
+            if (stristr($method->class, config('af-config.af_model_path'))) {
                 if (!in_array($method->name, $exclude)) {
                     $output[] = $method->name;
                 }

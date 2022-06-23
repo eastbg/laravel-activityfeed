@@ -95,6 +95,7 @@ class AfRulesCrudController extends CrudController
                 'type' => 'af_select_from_array',
                 'options' => [
                     '' => '-- Please Select --',
+                    'Record change' => 'Record change',
                     'Field change' => 'Field change',
                     'New record' => 'New record',
                     'Delete record' => 'Delete record',

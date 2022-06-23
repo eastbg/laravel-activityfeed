@@ -20,26 +20,26 @@ class CreateAfRulesTable extends Migration
             $table->bigInteger('id_category')->nullable()->unsigned();
             $table->bigInteger('id_template')->nullable()->unsigned();
 
-            $table->string('rule_script');
-            $table->string('creator_script');
+            $table->string('rule_script')->nullable();
+            $table->string('creator_script')->nullable();
 
-            $table->json('targeting');
-            $table->json('channels');
+            $table->json('targeting')->nullable();
+            $table->json('channels')->nullable();
 
-            $table->string('name');
-            $table->text('description');
+            $table->string('name')->nullable();
+            $table->text('description')->nullable();
 
-            $table->string('rule_type');
-            $table->string('rule');
+            $table->string('rule_type')->nullable();
+            $table->string('rule')->nullable();
 
-            $table->string('table_name');
-            $table->string('field_name');
+            $table->string('table_name')->nullable();
+            $table->string('field_name')->nullable();
 
-            $table->string('rule_operator');
-            $table->string('rule_value');
+            $table->string('rule_operator')->nullable();
+            $table->string('rule_value')->nullable();
 
-            $table->string('rule_actions');
-            $table->string('context');
+            $table->string('rule_actions')->nullable();
+            $table->string('context')->nullable();
 
             $table->tinyInteger('to_admins')->default(0);
             $table->tinyInteger('background_job')->default(0);
