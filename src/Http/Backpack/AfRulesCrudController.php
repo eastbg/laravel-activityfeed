@@ -2,6 +2,7 @@
 
 namespace East\LaravelActivityfeed\Http\Backpack;
 
+use App\Models\Zoho\Modules\Models\Technologies;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use East\LaravelActivityfeed\Facades\AfHelper;
@@ -27,7 +28,7 @@ class AfRulesCrudController extends CrudController
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
-     * 
+     *
      * @return void
      */
     public function setup()
@@ -39,7 +40,7 @@ class AfRulesCrudController extends CrudController
 
     /**
      * Define what happens when the List operation is loaded.
-     * 
+     *
      * @see  https://backpackforlaravel.com/docs/crud-operation-list-entries
      * @return void
      */
@@ -55,7 +56,7 @@ class AfRulesCrudController extends CrudController
         /**
          * Columns can be defined using the fluent syntax or array syntax:
          * - CRUD::column('price')->type('number');
-         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']); 
+         * - CRUD::addColumn(['name' => 'price', 'type' => 'number']);
          */
     }
 
@@ -67,42 +68,52 @@ class AfRulesCrudController extends CrudController
 
     /**
      * Define what happens when the Create operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-create
      * @return void
      */
     protected function setupCreateOperation()
     {
         CRUD::setValidation(AfRulesRequest::class);
+        $this->tabInfo();
+        $this->tabSetup();
+        $this->tabTargeting();
 
 
-        $this->crud->field('name');
-        $this->crud->field('enabled')->type('checkbox')->label('Enabled');
-        $this->crud->field('description')->type('textarea');
-        $this->crud->field('background_job')->type('checkbox')->label('Background Job')->hint('This rule is based on analysing database rather than reactive to table changes. For example: all users that have been inactive for more than a week.');
-        $this->crud->field('digestible')->type('checkbox')->label('Digestible')->hint('Email will be included in the digest as opposed to sending right away.');
 
-        $this->crud->addField(
-            [
-                'name'  => 'id_template',
-                'label' => 'Template',
-                'type'  => 'relationship',
-                'inline_create' => true,
-                'entity' => 'afTemplates',
-                'model' => AfTemplate::class,
-                'data_source' => url('fetch/template'),
-            ]
-        );
+        
+    }
+
+    private function tabSetup(){
 
         $this->crud->addField(
             [
-                'name'  => 'id_category',
-                'label' => 'Category',
-                'type'  => 'relationship',
-                'inline_create' => true,
-                'entity' => 'afCategories',
-                'model' => AfCategory::class,
-                'data_source' => url('/admin/af-categories/fetch/category'),
+                // select_from_array
+                'name' => 'rule_type',
+                'tab' => 'Rule Setup',
+                'label' => 'Rule Type',
+                'type' => 'af_select_from_array',
+                'options' => [
+                    '' => '-- Please Select --',
+                    'Field change' => 'Field change',
+                    'New record' => 'New record',
+                    'Delete record' => 'Delete record',
+                    'Field value' => 'Field value',
+                    'Custom script' => 'Custom script'
+                ],
+                'onchange' => [
+                    [
+                        'function' => 'afTargetingDisplay',
+                        'parameters' => [
+                            'rule_type',
+                        ]
+                    ],
+                ],
+                'hint' => 'Select what triggers',
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'targeting2'
+                ], // change the HTML attributes for the field wrapper - mostly for resizing fields
             ]
         );
 
@@ -111,14 +122,50 @@ class AfRulesCrudController extends CrudController
                 // select_from_array
                 'name' => 'table_name',
                 'label' => 'Table',
-                'type' => 'select2_from_array2',
-                'options' => AfHelper::getTables(),
+                'tab' => 'Rule Setup',
+                'type' => 'af_select_from_array',
+                'options' => AfHelper::gettables(),
                 'hint' => 'Leave empty to ignore',
-                'selected' => [],
-                'onchange' => 'updateSelectedTable',
-                'wrapper'   => [
+                'onchange' => [
+                    [
+                        'function' => 'afUpdateField',
+                        'parameters' => [
+                            'table_name',
+                            '/af-data/columns',
+                            'field_name'
+                        ]
+                    ],
+                    [
+                        'function' => 'afUpdateField',
+                        'parameters' => [
+                            'table_name',
+                            '/af-data/targeting',
+                            'targeting'
+                        ]
+                    ],
+                ],
+                'wrapper' => [
                     'class' => 'form-group col-md-12',
-                    'id' => 'targeting2'
+                    'id' => 'w_table_name'
+                ],
+            ]
+        );
+
+        //$this->crud->addField(['name' => 'separator-1','type' => 'af_separator','label' => 'Rule Setup']);
+
+
+        $this->crud->addField(
+            [
+                // select_from_array
+                'name' => 'rule_script',
+                'tab' => 'Rule Setup',
+                'label' => 'Custom Script',
+                'type' => 'af_select_from_array',
+                'options' => AfHelper::getRuleScripts(),
+                'hint' => 'Select a custom rule script (usually cron jobs)',
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'w_rule_script'
                 ], // change the HTML attributes for the field wrapper - mostly for resizing fields
             ]
         );
@@ -127,80 +174,121 @@ class AfRulesCrudController extends CrudController
             [
                 // select_from_array
                 'name' => 'field_name',
-                'label' => 'Field',
-                'type' => 'select_from_array2',
-                'options' => ['id' => 'id'],
+                'tab' => 'Rule Setup',
+                'label' => 'Column',
+                'type' => 'af_select_from_array',
+                'options' => ['-- Any --'],
                 'hint' => 'Select the database column',
-                'wrapper'   => [
+                'wrapper' => [
                     'class' => 'form-group col-md-12',
-                    'id' => 'targeting2'
+                    'id' => 'w_field_name'
                 ], // change the HTML attributes for the field wrapper - mostly for resizing fields
             ]
         );
 
         $this->crud->addField(
             [
-                'name'  => 'targeting',
-                'label' => 'Targeting',
-                'type'  => 'repeatable',
-                'subfields' => [ // also works as: "fields"
-                    [
-                        'name'    => 'Table',
-                        'type'    => 'text',
-                        'label'   => 'Title',
-                        'wrapper' => ['class' => 'form-group col-md-6'],
-                    ],
-                    [
-                        'name'    => 'Level',
-                        'label'   => 'Level (5 is better)',
-                        'type' => 'select_from_array',
-                        'options' => [5,4,3,2,1],
-                        'wrapper' => ['class' => 'form-group col-md-4'],
-                    ],
-                ],
-
-                // optional
-                'new_item_label'  => 'Add Item', // customize the text of the button
-                'init_rows' => 1, // number of empty rows to be initialized, by default 1
-                'min_rows' => 0, // minimum rows allowed, when reached the "delete" buttons will be hidden
-                'max_rows' => 10, // maximum rows allowed, when reached the "new item" button will be hidden
-                // allow reordering?
-                'reorder' => true, // hide up&down arrows next to each row (no reordering)
-                //'reorder' => true, // show up&down arrows next to each row
-                /*                'reorder' => 'order', // show arrows AND add a hidden subfield with that name (value gets updated when rows move)
-                                'reorder' => ['name' => 'order', 'type' => 'number', 'attributes' => ['data-reorder-input' => true]], // show arrows AND add a visible number subfield*/
+                // select_from_array
+                'name' => 'rule_operator',
+                'tab' => 'Rule Setup',
+                'label' => 'Operator',
+                'type' => 'select_from_array',
+                'options' => AfHelper::getRuleOperators(),
+                'hint' => 'Select the database column',
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'w_rule_operator'
+                ], // change the HTML attributes for the field wrapper - mostly for resizing fields
             ]
         );
 
-/*        CRUD::field('id');
-        CRUD::field('created_at');
-        CRUD::field('updated_at');
-        CRUD::field('id_category');
-        CRUD::field('id_template');
-        CRUD::field('name');
-        CRUD::field('description');
-        CRUD::field('rule_type');
-        CRUD::field('rule');
-        CRUD::field('table_name');
-        CRUD::field('field_name');
-        CRUD::field('rule_operator');
-        CRUD::field('rule_value');
-        CRUD::field('rule_actions');
-        CRUD::field('context');
-        CRUD::field('background_job');
-        CRUD::field('digestible');
-        CRUD::field('enabled');*/
+        $this->crud->addField(
+            [
+                // select_from_array
+                'name' => 'rule_value',
+                'tab' => 'Rule Setup',
+                'label' => 'Value',
+                'type' => 'text',
+                'hint' => 'Value when using an operator / custom script',
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'w_rule_value'
+                ], // change the HTML attributes for the field wrapper - mostly for resizing fields
+            ]
+        );
 
-        /**
-         * Fields can be defined using the fluent syntax or array syntax:
-         * - CRUD::field('price')->type('number');
-         * - CRUD::addField(['name' => 'price', 'type' => 'number'])); 
-         */
+    }
+
+    private function tabTargeting(){
+        $this->crud->field('to_admins')->type('checkbox')->label('Add to admins')->hint('Whether this notification is shown to admins.')->tab('Targeting');
+
+        $this->crud->addField(
+            [   // radio
+                'name' => 'channel', // the name of the db column
+                'tab' => 'Targeting',
+                'label' => 'Channels', // the input label
+                'type' => 'af_select_multiple_json',
+                'selected' => [],
+                'allow_multiple' => true,
+                'options' => AfHelper::getChannels(),
+                // optional
+                'inline'      => false, // show the radios all on the same line?
+            ]
+        );
+
+        $this->crud->addField(
+            [
+                // select_from_array
+                'name' => 'targeting',
+                'tab' => 'Targeting',
+                'label' => 'Targeting',
+                'type' => 'af_select_from_array',
+                'options' => ['-- Select the table first --'],
+                'hint' => 'Select the database column',
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'w_targeting'
+                ], // change the HTML attributes for the field wrapper - mostly for resizing fields
+            ]
+        );
+
+
+    }
+
+    private function tabInfo(){
+
+        $this->crud->field('name')->tab('Info');
+        $this->crud->field('enabled')->type('checkbox')->label('Enabled')->tab('Info');
+        $this->crud->field('description')->type('textarea')->tab('Info');
+        $this->crud->field('digestible')->type('checkbox')->label('Digestible')->hint('Email will be included in the digest as opposed to sending right away.')->tab('Info');
+        $this->crud->field('background_job')->type('checkbox')->label('Background Job')->hint('This rule is based on analysing database rather than reactive to table changes. For example: all users that have been inactive for more than a week.')->tab('Info');
+
+        $this->crud->addField(
+            [
+                'name' => 'id_template',
+                'label' => 'Template',
+                'tab' => 'Info',
+                'type' => 'select_from_array',
+                'options' => AfTemplate::all()->pluck('name', 'id')->toArray()
+            ]
+        );
+
+        $this->crud->addField(
+            [
+                'name' => 'id_category',
+                'label' => 'Category',
+                'tab' => 'Info',
+                'type' => 'select_from_array',
+                'options' => AfCategory::all()->pluck('name', 'id')->toArray()
+            ]
+        );
+
+
     }
 
     /**
      * Define what happens when the Update operation is loaded.
-     * 
+     *
      * @see https://backpackforlaravel.com/docs/crud-operation-update
      * @return void
      */

@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/af-data/fields', 'East\LaravelActivityfeed\Http\Api\AfData@index');
+Route::get('/af-data/columns', 'East\LaravelActivityfeed\Http\Api\AfData@columns');
+Route::get('/af-data/targeting', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
+//Route::get('/fetch/template', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
 
 Route::group([
     'prefix' => config('backpack.base.route_prefix', 'admin'),

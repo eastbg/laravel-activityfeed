@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static AfData getTables()
  * @method static AfData getColumns($table)
+ * @method static AfData getTargeting($table)
+ * @method static AfData getChannels()
+ * @method static AfData getRuleScripts()
+ * @method static AfData getRuleOperators()
  *
  * @package App\Facades
  */

@@ -5,6 +5,7 @@ namespace East\LaravelActivityfeed\Http\Backpack;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategoriesModel;
+use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRulesModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplates;
@@ -77,25 +78,29 @@ class AfTemplatesCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(AfTemplatesRequest::class);
+        $this->crud->setEditView('backpack.views.template-create-form');
+        $this->crud->setCreateView('backpack.views.template-create-form');
 
-        CRUD::field('id');
-        CRUD::field('created_at');
-        CRUD::field('updated_at');
-        CRUD::field('id_category');
-        CRUD::field('id_template');
+
         CRUD::field('name');
-        CRUD::field('description');
-        CRUD::field('rule_type');
-        CRUD::field('rule');
-        CRUD::field('table_name');
-        CRUD::field('field_name');
-        CRUD::field('rule_operator');
-        CRUD::field('rule_value');
-        CRUD::field('rule_actions');
-        CRUD::field('context');
-        CRUD::field('background_job');
-        CRUD::field('digestible');
-        CRUD::field('enabled');
+        $this->crud->field('enabled')->type('checkbox')->label('Enabled');
+        CRUD::field('description')->type('textarea');
+
+        $this->crud->addField(
+            [
+                'name' => 'id_category',
+                'label' => 'Category',
+                'type' => 'select_from_array',
+                'options' => AfCategory::all()->pluck('name', 'id')->toArray()
+            ]
+        );
+
+        $fields = ['notification','email','digest','admin'];
+
+        foreach($fields as $field){
+            CRUD::field('notification_'.$field)->label(ucfirst($field) .' subject');
+            CRUD::field($field.'_template')->type('textarea')->label(ucfirst($field) .' text content');
+        }
 
         /**
          * Fields can be defined using the fluent syntax or array syntax:

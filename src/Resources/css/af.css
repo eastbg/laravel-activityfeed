@@ -9,3 +9,14 @@
     color: #0b4d75;
 }
 
+.w_field_name {
+    display: none;
+}
+
+.w_rule_operator{
+    display: none;
+}
+
+.w_rule_value{
+    display: none;
+}

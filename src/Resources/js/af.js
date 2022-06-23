@@ -1,19 +1,53 @@
+window.addEventListener('load', function () {
+    afTargetingDisplay('table_name');
+})
+
 /*
-* Finds the database columns based on
+* Updates another field
 * */
-function updateSelectedTable(name){
+function afUpdateField(name, api, target) {
 
     let field = document.getElementById(name);
+    let url = api + '?' + name + '=' + field.value;
 
-    $.getJSON('/af-data/fields?table='+field.value, function(data) {
+    $.getJSON(url, function (data) {
         var options = "";
 
         $.each(data, function (key, val) {
             options = options + "<option>" + val + "</option>";
         });
 
-        $('select#field_name').html(options);
+        $('select#' + target).html(options);
     });
+}
+
+function afTargetingDisplay(name) {
+    let field = document.getElementById(name);
+
+    if (field.value === 'Field change' || field.value === 'Field value') {
+        document.getElementById("w_table_name").style.display = "block";
+        document.getElementById("w_field_name").style.display = "block";
+        document.getElementById("w_rule_operator").style.display = "block";
+        document.getElementById("w_rule_value").style.display = "block";
+        document.getElementById("w_targeting").style.display = "block";
+        document.getElementById("w_rule_script").style.display = "none";
+    } else if (field.value === 'Custom script'){
+        document.getElementById("w_table_name").style.display = "none";
+        document.getElementById("w_field_name").style.display = "none";
+        document.getElementById("w_targeting").style.display = "none";
+
+        document.getElementById("w_rule_operator").style.display = "block";
+        document.getElementById("w_rule_script").style.display = "block";
+        document.getElementById("w_rule_value").style.display = "block";
+    } else {
+        document.getElementById("w_field_name").style.display = "none";
+        document.getElementById("w_rule_operator").style.display = "none";
+        document.getElementById("w_rule_value").style.display = "none";
+        document.getElementById("w_table_name").style.display = "none";
+        document.getElementById("w_rule_script").style.display = "none";
+
+        document.getElementById("w_targeting").style.display = "block";
+    }
 }
 
 
@@ -50,10 +84,6 @@ function updateSelectedTable(name){
         $('select#field_name').html(options);
         });
 */
-
-
-
-
 
 
 /*

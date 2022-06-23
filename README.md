@@ -1,3 +1,7 @@
+ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/views/backpack/fields/af_select_from_array.blade.php /Users/trailo/dev/vendors.east.fi/example-app/resources/views/vendor/backpack/crud/fields/af_select_from_array.blade.php
+ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/views/backpack/fields/af_select_multiple_json.blade.php /Users/trailo/dev/vendors.east.fi/example-app/resources/views/vendor/backpack/crud/fields/af_select_multiple_json.blade.php
+ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/js/af.js /Users/trailo/dev/vendors.east.fi/example-app/public/js/af.js
+
 # laravel-activityfeed
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
@@ -100,12 +104,7 @@ You have a new notification, click <a href="{{$url ?? ''}}">here</a> to read it.
 ```
 The variable replacement happens at save time and is "blind" so you should adjust your templates accordingly. 
 
-Template itself usually defines:
- * channel
- * subject
- * digest vs. individual notification
- * target (admins vs user)
-
+Rules define targeting and channels.
 
 ### Forking / messing with the models
 

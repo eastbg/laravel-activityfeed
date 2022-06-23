@@ -2,6 +2,7 @@
 
 namespace East\LaravelActivityfeed\Models\Helpers;
 
+use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -30,7 +31,7 @@ class AfData extends Model
         }
     }
 
-    public function getTables()
+    public function getTables(): array
     {
         $tables = DB::select('SHOW TABLES');
         $output = [];
@@ -58,16 +59,101 @@ class AfData extends Model
         return $output;
     }
 
-    public function getColumns($table)
+    public function getColumns(string $table): array
     {
         $columns = DB::getSchemaBuilder()->getColumnListing($table);
-        $output = [];
+        $output[] = '-- Any --';
 
         foreach ($columns as $col) {
             $output[] = $col;
         }
 
         return $output;
+    }
+
+
+    public function getRelationships(string $table): array
+    {
+        $class = config('activity-feed.af_model_path') . '\\' . $table;
+        $reflector = new \ReflectionClass($class);
+        $output = [];
+        $exclude = ['booted', 'save', 'delete', 'update'];
+
+        foreach ($reflector->getMethods() as $method) {
+            if (stristr($method->class, config('activity-feed.af_model_path'))) {
+                if (!in_array($method->name, $exclude)) {
+                    $output[] = $method->name;
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    public function getTargeting(string $table)
+    {
+        $output = [];
+
+        $output[''] = '-- No targeting, only admins --';
+
+        foreach ($this->getRoutings() as $tbl => $config) {
+            if ($table == $tbl) {
+                foreach ($config as $k => $v) {
+                    $output[$v['id']] = $v['title'];
+                }
+            }
+        }
+
+        return $output;
+    }
+
+    public function getRoutings(): array
+    {
+        return config('af-database-targeting.tables');
+    }
+
+    public function getChannels(): array
+    {
+        return $this->getFiles('Channels', ['ChannelBase.php', 'ChannelTemplate.php']);
+    }
+
+    public function getRuleScripts(): array
+    {
+        return $this->getFiles('Rules', ['RuleBase.php', 'RuleTemplate.php']);
+    }
+
+    public function getRuleOperators() : array {
+        return [
+            '' => '-- No operator --',
+            'empty' => 'Is empty',
+            'not_empty' => 'Is not empty',
+            '=' => '=',
+            '<' => '< (value smaller than)',
+            '>' => '> (value bigger than)',
+        ];
+    }
+
+    private function getFiles(string $directory, array $exclusions = [])
+    {
+        $custom = app_path('ActivityFeed/' . $directory . '/');
+        $custom = scandir($custom);
+
+        $built_in = app_path('../vendor/east/laravel-activityfeed/src/ActivityFeed/' . $directory . '/');
+        $built_in = scandir($built_in);
+
+        $files = array_merge($built_in,$custom);
+        $output = [];
+
+        foreach ($files as $name) {
+            if (stristr($name, '.php') and !in_array($name, $exclusions)) {
+                $name = str_replace('.php', '', $name);
+                $name = str_replace('Channel', '', $name);
+                $output[$name] = $name;
+            }
+        }
+
+        return $output;
+
     }
 
 

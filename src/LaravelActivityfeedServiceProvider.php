@@ -37,7 +37,8 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/activity-feed.php', 'af_feed');
+        $this->mergeConfigFrom(__DIR__ . '/../config/af-config.php', 'af_feed');
+        $this->mergeConfigFrom(__DIR__ . '/../config/af-database-targeting.php', 'af_feed');
         $this->publishConfig();
 
         $this->loadViewsFrom(__DIR__.'/Resources/views', 'af_feed');
@@ -56,6 +57,10 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         ], 'asset');
 
         $this->publishes([
+            __DIR__ . '/Resources/views/backpack/views/template-create-form.blade.php' => resource_path('views/backpack/views/template-create-form.blade.php'),
+        ], 'asset');
+
+        $this->publishes([
             __DIR__ . '/ActivityFeed/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
         ], 'asset');
 
@@ -66,6 +71,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/ActivityFeed/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channels/Email.php'),
         ], 'asset');
+
 
         $this->registerRoutes();
 
@@ -144,7 +150,11 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__ . '/../config/activity-feed.php' => config_path('activity-feed.php'),
+                __DIR__ . '/../config/af-config.php' => config_path('af-config.php'),
+            ], 'config');
+
+            $this->publishes([
+                __DIR__ . '/../config/af-database-targeting.php' => config_path('af-database-targeting.php'),
             ], 'config');
         }
     }
