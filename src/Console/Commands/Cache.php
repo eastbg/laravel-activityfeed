@@ -2,7 +2,7 @@
 
 namespace East\LaravelActivityfeed\Console\Commands;
 
-use East\LaravelActivityfeed\Models\Helpers\AfCaching;
+use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use East\LaravelActivityfeed\Models\Helpers\AfGenerator;
 use Illuminate\Console\Command;
 
@@ -39,7 +39,7 @@ class Cache extends Command
      */
     public function handle()
     {
-        $obj = new AfCaching();
+        $obj = new AfCachingHelper();
         $obj->flushCaches();
     }
 }

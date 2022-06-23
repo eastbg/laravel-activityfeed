@@ -29,20 +29,22 @@ class ActivityFeedBaseModel extends Model
     {
         if ($this->exists) {
             $rules = AfHelper::getTableRules($this->getTable(), 'Record change');
+            $operation = 'updated';
         } else {
             $rules = AfHelper::getTableRules($this->getTable(), 'New Record');
+            $operation = 'created';
         }
 
         if ($rules and isset(auth()->user()->id)) {
             foreach ($rules as $rule) {
-                $this->saveRule($rule);
+                $this->saveRule($rule,$operation);
             }
         }
 
         parent::save();
     }
 
-    private function saveRule($rule)
+    private function saveRule($rule,$operation)
     {
 
         $check = AfEvent::where('id_rule', '=', $rule->id)
@@ -56,6 +58,10 @@ class ActivityFeedBaseModel extends Model
         $event = new AfEvent();
         $event->id_user_creator = auth()->user()->id;
         $event->id_rule = $rule->id;
+        $event->dbtable = $this->getTable();
+        $event->dbkey = $this->id;
+        $event->operation = $operation;
+        $event->field = $rule->field_name;
         $event->save();
     }
 

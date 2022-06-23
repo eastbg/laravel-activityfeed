@@ -8,8 +8,10 @@ use East\LaravelActivityfeed\Console\Commands\Cache;
 use East\LaravelActivityfeed\Console\Commands\Generator;
 use East\LaravelActivityfeed\Console\Commands\Install;
 use East\LaravelActivityfeed\Console\Commands\Notify;
-use East\LaravelActivityfeed\Models\Helpers\AfCaching;
+use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use East\LaravelActivityfeed\Models\Helpers\AfData;
+use East\LaravelActivityfeed\Models\Helpers\AfDataHelper;
+use East\LaravelActivityfeed\Models\Helpers\AfTemplateHelper;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -127,16 +129,20 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             return new \East\LaravelActivityfeed\Actions\AfRenderActions();
         });
 
+        $this->app->bind('af-templating', function () {
+            return new AfTemplateHelper();
+        });
+
         $this->app->bind('af-helper', function () {
-            return new AfData();
+            return new AfDataHelper();
         });
 
-        $this->app->singleton(AfCaching::class, function () {
-            return new AfCaching();
+        $this->app->singleton(AfCachingHelper::class, function () {
+            return new AfCachingHelper();
         });
 
-        $this->app->singleton(AfData::class, function () {
-            return new AfData();
+        $this->app->singleton(AfDataHelper::class, function () {
+            return new AfDataHelper();
         });
 
     }

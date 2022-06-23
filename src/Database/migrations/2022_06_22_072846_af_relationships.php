@@ -31,6 +31,7 @@ class AfRelationships extends Migration
             $table->foreign('id_user_recipient')->references('id')->on('users')->onDelete('CASCADE');
             $table->foreign('id_user_creator')->references('id')->on('users')->onDelete('SET NULL');
             $table->foreign('id_rule')->references('id')->on('af_rules')->onDelete('CASCADE');
+            $table->foreign('id_event')->references('id')->on('af_events')->onDelete('CASCADE');
         });
 
 

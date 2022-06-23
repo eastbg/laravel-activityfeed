@@ -5,7 +5,7 @@ namespace East\LaravelActivityfeed\Actions;
 use App\Models\Email\Emailer;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
-use East\LaravelActivityfeed\Models\Helpers\AfCaching;
+use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
@@ -36,6 +36,7 @@ class AfPollAction extends Model
         $obj->id_user_recipient = $id;
         $obj->id_user_creator = $record->id_user_creator;
         $obj->id_rule = $record->id_rule;
+        $obj->id_event = $record->id;
         $obj->save();
     }
 

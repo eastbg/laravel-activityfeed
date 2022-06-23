@@ -19,6 +19,7 @@ class AfNotifications extends Migration
             $table->bigInteger('id_user_recipient')->nullable()->unsigned();
             $table->bigInteger('id_user_creator')->nullable()->unsigned();
             $table->bigInteger('id_rule')->nullable()->unsigned();
+            $table->bigInteger('id_event')->nullable()->unsigned();
             $table->dateTime('expiry');
             $table->tinyInteger('sent')->default(0);
             $table->tinyInteger('read')->default(0);

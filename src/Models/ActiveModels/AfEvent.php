@@ -8,6 +8,10 @@ use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
  * @property integer $id
  * @property integer $id_user_creator
  * @property integer $id_rule
+ * @property int $dbkey
+ * @property string $dbtable
+ * @property string $operation
+ * @property string $field
  * @property boolean $processed
  * @property AfRule $afRule
  * @property User $user
@@ -31,7 +35,9 @@ class AfEvent extends ActivityFeedBaseModel
     /**
      * @var array
      */
-    protected $fillable = ['id_user_creator', 'id_template', 'id_rule', 'id_category', 'created_at', 'updated_at', 'targeting', 'expiry', 'processed', 'admins', 'digest', 'digested', 'to_admins', 'background_job', 'popup'];
+    protected $fillable = ['id_user_creator', 'id_template', 'id_rule', 'id_category',
+        'created_at', 'updated_at', 'targeting', 'expiry', 'processed', 'admins', 'digest',
+        'digested', 'to_admins', 'background_job', 'popup','dbtable','dbkey','operation','field'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

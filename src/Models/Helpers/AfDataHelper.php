@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class AfData extends Model
+class AfDataHelper extends Model
 {
     use HasFactory;
 
     public static $caches = [
-        'af_rules'
+        'af_rules',
+        'af_template_files'
     ];
 
     public $random;

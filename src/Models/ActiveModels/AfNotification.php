@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User;
  * @property integer $id_user_recipient
  * @property integer $id_user_creator
  * @property integer $id_rule
+ * @property integer $id_event
  * @property string $created_at
  * @property string $updated_at
  * @property string $expiry
@@ -19,6 +20,7 @@ use Illuminate\Foundation\Auth\User;
  * @property boolean $processed
  * @property User $creator
  * @property AfRule $afRule
+ * @property AfEvent $afEvent
  * @property User $recipient
  */
 class AfNotification extends ActivityFeedBaseModel
@@ -40,7 +42,10 @@ class AfNotification extends ActivityFeedBaseModel
     /**
      * @var array
      */
-    protected $fillable = ['id_user_recipient', 'id_user_creator', 'id_template', 'id_rule', 'id_category', 'created_at', 'updated_at', 'channels', 'notification_subject', 'notification_template', 'email_subject', 'email_template', 'digest_subject', 'digest_template', 'admin_subject', 'admin_template', 'expiry', 'sent', 'read', 'digest', 'digested', 'processed', 'popup'];
+    protected $fillable = ['id_user_recipient', 'id_user_creator', 'id_template','id_event',
+        'id_rule', 'id_category', 'created_at', 'updated_at', 'channels', 'notification_subject',
+        'notification_template', 'email_subject', 'email_template', 'digest_subject', 'digest_template',
+        'admin_subject', 'admin_template', 'expiry', 'sent', 'read', 'digest', 'digested', 'processed', 'popup'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -56,6 +61,14 @@ class AfNotification extends ActivityFeedBaseModel
     public function afRule()
     {
         return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfRule', 'id_rule');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function afEvent()
+    {
+        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfEvent', 'id_event');
     }
 
     /**
