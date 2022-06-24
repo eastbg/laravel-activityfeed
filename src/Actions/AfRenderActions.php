@@ -41,6 +41,8 @@ class AfRenderActions extends Model
             'AfRule','recipient','creator','AfRule.AfTemplate'
         ])->get();
 
+        $items = [];
+
         foreach($feed as $item){
             $items[] = view('vendor.activity-feed.'.$item->AfRule->AfTemplate->id.'.notification',[
                 'recipient' => $item->recipient,

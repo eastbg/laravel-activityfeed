@@ -2,7 +2,9 @@
 
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
+use East\LaravelActivityfeed\Models\ActiveModelBase;
 use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 
 /**
@@ -23,7 +25,7 @@ use Illuminate\Foundation\Auth\User;
  * @property AfEvent $afEvent
  * @property User $recipient
  */
-class AfNotification extends ActivityFeedBaseModel
+class AfNotification extends ActiveModelBase
 {
     /**
      * The table associated with the model.

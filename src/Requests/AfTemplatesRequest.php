@@ -25,7 +25,8 @@ class AfTemplatesRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+             'name' => 'required|min:5|max:255',
+             'slug' => 'unique:af_templates|min:4|max:255',
         ];
     }
 

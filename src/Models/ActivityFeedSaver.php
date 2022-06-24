@@ -22,13 +22,6 @@ class ActivityFeedSaver
         return $this;
     }
 
-    public function save(){
-
-    }
-
-
-
-
 
 
 }

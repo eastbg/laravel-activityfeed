@@ -19,4 +19,14 @@ class AfData extends Controller
     {
         return AfHelper::getTargeting($request->get('table_name'));
     }
+
+    public function tables(Request $request)
+    {
+        return AfHelper::getTables();
+    }
+
+    public function relationships(Request $request)
+    {
+        return AfHelper::getRelationships($request->get('table_name'));
+    }
 }

@@ -2,9 +2,9 @@
 
 namespace East\LaravelActivityfeed\Http\Backpack;
 
-use App\Models\Zoho\Modules\Models\Technologies;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
 use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
@@ -25,6 +25,8 @@ class AfRulesCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
+
+    use CloneOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -47,7 +49,7 @@ class AfRulesCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
-        CRUD::column('enabled');
+        CRUD::column('enabled')->type('check');;
         CRUD::column('rule_type');
         CRUD::column('rule');
         CRUD::column('table_name');

@@ -30,6 +30,7 @@ class AfCategoriesCrudController extends CrudController
 
     use CloneOperation;
 
+
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
      * 
@@ -57,10 +58,8 @@ class AfCategoriesCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
+        CRUD::column('enabled')->type('check');
         CRUD::column('description');
-        CRUD::column('enabled')->type('checkbox');
-        CRUD::column('ui_placement');
-        CRUD::column('icon');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:

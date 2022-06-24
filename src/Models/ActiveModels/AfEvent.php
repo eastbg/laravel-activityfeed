@@ -2,21 +2,25 @@
 
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
+use East\LaravelActivityfeed\Models\ActiveModelBase;
 use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property integer $id
  * @property integer $id_user_creator
  * @property integer $id_rule
- * @property int $dbkey
+ * @property string $created_at
+ * @property string $updated_at
+ * @property integer $dbkey
  * @property string $dbtable
  * @property string $operation
- * @property string $field
+ * @property string $dbfield
  * @property boolean $processed
  * @property AfRule $afRule
- * @property User $user
+ * @property User $creator
  */
-class AfEvent extends ActivityFeedBaseModel
+class AfEvent extends ActiveModelBase
 {
     /**
      * The table associated with the model.
@@ -32,12 +36,21 @@ class AfEvent extends ActivityFeedBaseModel
      */
     protected $keyType = 'integer';
 
+
     /**
      * @var array
      */
-    protected $fillable = ['id_user_creator', 'id_template', 'id_rule', 'id_category',
-        'created_at', 'updated_at', 'targeting', 'expiry', 'processed', 'admins', 'digest',
-        'digested', 'to_admins', 'background_job', 'popup','dbtable','dbkey','operation','field'];
+    protected $fillable = [
+        'id_user_creator',
+        'id_rule',
+        'created_at',
+        'updated_at',
+        'processed',
+        'dbtable',
+        'dbkey',
+        'operation',
+        'dbfield'
+    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -50,7 +63,7 @@ class AfEvent extends ActivityFeedBaseModel
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function user()
+    public function creator()
     {
         return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\User', 'id_user_creator');
     }

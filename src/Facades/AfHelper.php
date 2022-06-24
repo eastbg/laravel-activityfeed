@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static AfDataHelper flushCaches()
  * @method static AfDataHelper getRules()
  * @method static AfDataHelper getTableRules($table,$rule_type)
+ * @method static AfDataHelper getRelationships($table)
  *
  * @package App\Facades
  */

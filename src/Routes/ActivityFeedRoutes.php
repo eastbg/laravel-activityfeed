@@ -2,7 +2,9 @@
 
 use Illuminate\Support\Facades\Route;
 
+Route::get('/af-data/tables', 'East\LaravelActivityfeed\Http\Api\AfData@tables');
 Route::get('/af-data/columns', 'East\LaravelActivityfeed\Http\Api\AfData@columns');
+Route::get('/af-data/relationships', 'East\LaravelActivityfeed\Http\Api\AfData@relationships');
 Route::get('/af-data/targeting', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
 //Route::get('/fetch/template', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
 
@@ -15,5 +17,6 @@ Route::group([
     Route::crud('af-events', 'AfEventsCrudController');
     Route::crud('af-rules', 'AfRulesCrudController');
     Route::crud('af-templates', 'AfTemplatesCrudController');
+    Route::crud('af-temp', 'AfTempCrudController');
    // Route::crud('af-templates/fetch', 'AfTemplatesCrudController');
 }); // this should be the absolute last line of this file

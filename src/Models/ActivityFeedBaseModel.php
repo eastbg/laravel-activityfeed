@@ -10,6 +10,8 @@ use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ActivityFeedBaseModel extends Model
 {
@@ -51,7 +53,7 @@ class ActivityFeedBaseModel extends Model
 
         if ($rules) {
             foreach ($rules as $rule) {
-                if($this->checkCustomRule($rule)){
+                if($this->ruleCustomRule($rule)){
                     if ($this->saveRule($rule, 'Custom')) {
                         parent::save();
                         return;
@@ -77,12 +79,14 @@ class ActivityFeedBaseModel extends Model
         $operation = 'field value set to';
 
         foreach ($rules as $rule) {
-            if ($this->saveRule($rule, $operation)) {
-                parent::save();
-                return;
+            $field = $rule->field_name;
+            if(isset($this->$field) AND $this->$field == $rule->field_value){
+                if ($this->saveRule($rule, $operation)) {
+                    parent::save();
+                    return;
+                }
             }
         }
-
 
         if ($this->exists) {
             $rules = AfHelper::getTableRules($this->getTable(), 'Record change');
@@ -92,17 +96,21 @@ class ActivityFeedBaseModel extends Model
             $operation = 'created';
         }
 
-        if ($rules and isset(auth()->user()->id)) {
+        if ($rules) {
             foreach ($rules as $rule) {
                 $this->saveRule($rule, $operation);
             }
         }
 
+        //die();
         parent::save();
     }
 
+    private function ruleChangeAndCreate(){
 
-    private function checkCustomRule($rules)
+    }
+
+    private function ruleCustomRule($rules)
     {
 
         return false;
@@ -118,11 +126,15 @@ class ActivityFeedBaseModel extends Model
     private function saveRule(AfRule $rule, string $operation)
     {
 
+        //echo('starting');
+
+        DB::enableQueryLog();
         $check = AfEvent::where('id_rule', '=', $rule->id)
             ->whereTime('created_at', '>', Carbon::now()->subSeconds(config('af-config.repeat_events_grace')))
             ->get();
 
         if ($check->isNotEmpty()) {
+            echo('is not empty');
             return false;
         }
 
@@ -132,8 +144,13 @@ class ActivityFeedBaseModel extends Model
         $event->dbtable = $this->getTable();
         $event->dbkey = $this->id;
         $event->operation = $operation;
-        $event->field = $rule->field_name;
-        $event->save();
+        $event->dbfield = $rule->field_name;
+
+        try {
+            $event->save();
+        } catch (\Throwable $e){
+            Log::log('error',$e->getMessage());
+        }
 
         return true;
     }

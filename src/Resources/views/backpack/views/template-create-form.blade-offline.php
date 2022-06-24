@@ -1,10 +1,11 @@
+
 <script type="text/javascript">
 
     window.addEventListener('load', function () {
         targetingHide();
     })
 
-    const targetingHide = function () {
+    const targetingHide = function(){
         document.getElementById('targeting1').style.display = "none";
         document.getElementById('targeting2').style.display = "none";
         document.getElementById('targeting3').style.display = "none";
@@ -14,7 +15,7 @@
         document.getElementById('targeting_hidden').style.display = "inline";
     }
 
-    const targetingShow = function () {
+    const targetingShow = function(){
         document.getElementById('targeting1').style.display = "block";
         document.getElementById('targeting2').style.display = "block";
         document.getElementById('targeting3').style.display = "block";
@@ -63,11 +64,11 @@
     }
 
     textarea.form-control {
-        height: 150px !important;
+        height:250px!important;
     }
 
     small {
-        display: none !important;
+        display: none!important;
     }
 
     .af-code {
@@ -79,6 +80,7 @@
     }
 
 </style>
+
 
 @extends(backpack_view('blank'))
 
@@ -101,44 +103,72 @@
 
             @if ($crud->hasAccess('list'))
                 <small><a href="{{ url($crud->route) }}" class="d-print-none font-sm"><i
-                                class="la la-angle-double-{{ config('backpack.base.html_direction') == 'rtl' ? 'right' : 'left' }}"></i> {{ trans('backpack::crud.back_to_all') }}
+                            class="la la-angle-double-{{ config('backpack.base.html_direction') == 'rtl' ? 'right' : 'left' }}"></i> {{ trans('backpack::crud.back_to_all') }}
                         <span>{{ $crud->entity_name_plural }}</span></a></small>
             @endif
         </h2>
     </section>
 @endsection
 
+
 @section('content')
+    <br>
+    @include('backpack.crud.inc.custom_tabbing')
 
     <div class="row">
+
         <div class="col-7">
 
+            {{--
+                        <div class="{{ $crud->getCreateContentClass() }}">
+            --}}
             <!-- Default box -->
 
             @include('crud::inc.grouped_errors')
 
             <form method="post"
+                  name="emailForm"
                   action="{{ url($crud->route) }}"
                   @if ($crud->hasUploadFields('create'))
                       enctype="multipart/form-data"
-                    @endif
+                @endif
             >
                 {!! csrf_field() !!}
                 <!-- load the view from the application if it exists, otherwise load the one in the package -->
-                @if(view()->exists('vendor.backpack.crud.form_content'))
-                    @include('vendor.backpack.crud.form_content', [ 'fields' => $crud->fields(), 'action' => 'create' ])
-                @else
-                    @include('crud::form_content', [ 'fields' => $crud->fields(), 'action' => 'create' ])
-                @endif
+                @include('vendor.backpack.crud.form_content', [ 'fields' => $crud->fields()])
                 <!-- This makes sure that all field assets are loaded. -->
                 <div class="d-none" id="parentLoadedAssets">{{ json_encode(Assets::loaded()) }}</div>
                 @include('crud::inc.form_save_buttons')
             </form>
+            {{--
+                       </div>
+            --}}
         </div>
         <div class="col-5">
-            @include('af_feed::backpack.views.template-info')
+            Templates are in Laravel Blade format. They are fed with var replacement and data replacement. Idea is that you can dump data from your database record and it's relations directly to the template. So you could define it like this:
+            <br><div class="af-code">
+            @php echo(htmlspecialchars( 'You have a new notification, click <a href="{{$url ?? \'\'}}">here</a> to read it.')); @endphp
+            </div>
+
+            So also this would work:
+            <br><div class="af-code">
+                @php echo( htmlspecialchars('@if(isset($username) AND $username)) Hello {{$username}}! @endif<br>
+            You have a new notification, click <a href="{{$url ?? \'\'}}">here</a> to read it.')); @endphp
+            </div>
+
+            And this (provided the correct relations exist):
+            <br><div class="af-code">
+            @php echo(htmlspecialchars('@if(isset($user->profile) AND $user->profile)) Hello {{$user->profile->name}}! @endif')); @endphp <br>
+            You have a new notification, click <a href="{{$url ?? ''}}">here</a> to read it.
+            </div>
+            The variable replacement happens at save time and is "blind" so you should adjust your templates accordingly.
+            <br><br>
+            Rules define targeting and channels.
+            <br><br>
+
+            <a href="https://laravel.com/docs/9.x/blade">Blade Syntax</a>
+
         </div>
-    </div>
     </div>
 
 @endsection

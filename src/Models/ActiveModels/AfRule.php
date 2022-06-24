@@ -3,7 +3,9 @@
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
 use East\LaravelActivityfeed\Facades\AfHelper;
+use East\LaravelActivityfeed\Models\ActiveModelBase;
 use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -36,7 +38,7 @@ use Illuminate\Support\Facades\Cache;
  * @property AfEvent[] $afEvents
  * @property AfNotification[] $afNotifications
  */
-class AfRule extends ActivityFeedBaseModel
+class AfRule extends ActiveModelBase
 {
     /**
      * The "type" of the auto-incrementing ID.
