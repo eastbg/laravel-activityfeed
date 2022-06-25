@@ -4,7 +4,12 @@
     $field['value'] = old_empty_or_null($field['name'], '') ??  $field['value'] ?? $field['default'] ?? '';
     $field['multiple'] = $field['allows_multiple'] ?? false;
     $field['placeholder'] = $field['placeholder'] ?? ($field['multiple'] ? trans('backpack::crud.select_entries') : trans('backpack::crud.select_entry'));
-@endphp
+
+    if(count($field['options']) == 1 AND $field['value'] AND $field['options'][0] != $field['value']){
+        $field['options'][$field['value']] = str_replace('_',' ',ucfirst($field['value']));
+    }
+
+    @endphp
 @include('crud::fields.inc.wrapper_start')
 <label>{!! $field['label'] !!}</label>
 {{-- To make sure a value gets submitted even if the "select multiple" is empty, we need a hidden input --}}

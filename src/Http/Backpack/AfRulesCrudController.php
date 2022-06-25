@@ -227,11 +227,11 @@ class AfRulesCrudController extends CrudController
 
         $this->crud->addField(
             [   // radio
-                'name' => 'channel', // the name of the db column
+                'name' => 'channels', // the name of the db column
                 'tab' => 'Targeting',
                 'label' => 'Channels', // the input label
                 'type' => 'af_select_multiple_json',
-                'selected' => [],
+                //'selected' => $this->crud->model->channels,
                 'allow_multiple' => true,
                 'options' => AfHelper::getChannels(),
                 // optional

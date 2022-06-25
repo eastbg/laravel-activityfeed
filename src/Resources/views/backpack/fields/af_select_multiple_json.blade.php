@@ -4,10 +4,20 @@
 
     $field['multiple'] = true;
     $field['placeholder'] = $field['placeholder'] ?? trans('backpack::crud.select_entries');
-
     $field['value'] = old_empty_or_null($field['name'], collect()) ??  $field['value'] ?? $field['default'] ?? collect();
 
-    //print_r($field);die();
+    if(stristr($field['value'],'["')){
+        $field['value'] = json_decode($field['value'],true);
+    }
+
+
+    if (isset($field['value']) AND isset($field['model']) AND is_a($field['value'], \Illuminate\Support\Collection::class)) {
+        $field['value'] = $field['value']->pluck(app($field['model'])->getKeyName())->toArray();
+    }
+
+    if(!$field['value']){
+        $field['value'] = [];
+    }
 
 @endphp
 
@@ -18,25 +28,25 @@
 <input type="hidden" name="{{ $field['name'] }}" value=""
        @if(in_array('disabled', $field['attributes'] ?? [])) disabled @endif />
 <select
-    @if(isset($field['onchange']))
-        onchange="{{$field['onchange']}}('{{ $field['name'] }}');"
-    id="{{ $field['name'] }}"
-    @endif
-    name="{{ $field['name'] }}[]"
-    style="width: 100%"
-    data-init-function="bpFieldInitSelect2MultipleElement"
-    data-field-is-inline="{{var_export($inlineCreate ?? false)}}"
-    data-select-all="{{ var_export($field['select_all'] ?? false)}}"
-    data-options-for-js="{{json_encode(array_values($field['options']))}}"
-    data-language="{{ str_replace('_', '-', app()->getLocale()) }}"
-    data-allows-null="true"
-    data-placeholder="{{$field['placeholder']}}"
-    @include('crud::fields.inc.attributes', ['default_class' =>  'form-control select2_multiple'])
-    multiple>
+        @if(isset($field['onchange']))
+            onchange="{{$field['onchange']}}('{{ $field['name'] }}');"
+        id="{{ $field['name'] }}"
+        @endif
+        name="{{ $field['name'] }}[]"
+        style="width: 100%"
+        data-init-function="bpFieldInitSelect2MultipleElement"
+        data-field-is-inline="{{var_export($inlineCreate ?? false)}}"
+        data-select-all="{{ var_export($field['select_all'] ?? false)}}"
+        data-options-for-js="{{json_encode(array_values($field['options']))}}"
+        data-language="{{ str_replace('_', '-', app()->getLocale()) }}"
+        data-allows-null="true"
+        data-placeholder="{{$field['placeholder']}}"
+        @include('crud::fields.inc.attributes', ['default_class' =>  'form-control select2_multiple'])
+        multiple>
 
 
     @foreach ($field['options'] as $option)
-        @if(in_array($option, $field['selected']))
+        @if(is_array($field['value']) AND in_array($option, $field['value']))
             <option value="{{ $option }}" selected>{{ $option }}</option>
         @else
             <option value="{{ $option }}">{{ $option }}</option>

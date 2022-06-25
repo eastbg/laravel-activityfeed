@@ -1,11 +1,26 @@
 window.addEventListener('load', function () {
     afTargetingDisplay('rule_type');
+    afConfigureTableName();
 })
+
+
+function afConfigureTableName(){
+    let field = document.getElementById('table_name').value;
+    let selected = document.getElementById('table_name').e.options[e.selectedIndex].text;
+
+    if(field){
+        if(selected){
+            afUpdateField('table_name','/af-data/targeting','targeting',selected)
+        } else {
+            afUpdateField('table_name','/af-data/targeting','targeting')
+        }
+    }
+}
 
 /*
 * Updates another field
 * */
-function afUpdateField(name, api, target) {
+function afUpdateField(name, api, target,selected='') {
 
     let field = document.getElementById(name);
     let url = api + '?' + name + '=' + field.value;
@@ -14,7 +29,11 @@ function afUpdateField(name, api, target) {
         var options = "";
 
         $.each(data, function (key, val) {
-            options = options + "<option>" + val + "</option>";
+            if(selected && selected === key){
+                options = options + "<option value='"+key+"' selected>" + val + "</option>";
+            } else {
+                options = options + "<option value='"+key+"'>" + val + "</option>";
+            }
         });
 
         $('select#' + target).html(options);
