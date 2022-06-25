@@ -5,6 +5,7 @@
  * needs to lead to users table to be targeted.
  * */
 
+// todo: support any depth of relationships
 return [
     'tables' => [
         'Accounts' => [
@@ -12,7 +13,7 @@ return [
                 'id' => 'account_contacts',
                 'title' => 'Account Contacts',
                 'description' => '',
-                'relations' => ['contact', 'users']
+                'relations' => ['Contacts', 'User']
             ],
         ],
         'Deals' => [

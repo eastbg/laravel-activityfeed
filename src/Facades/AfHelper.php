@@ -12,7 +12,8 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static AfDataHelper getTables()
  * @method static AfDataHelper getColumns($table)
- * @method static AfDataHelper getTargeting($table)
+ * @method static AfDataHelper getTableTargeting($table)
+ * @method static AfDataHelper getTargeting($table,$id_rule)
  * @method static AfDataHelper getChannels()
  * @method static AfDataHelper getRuleScripts()
  * @method static AfDataHelper getRuleOperators()

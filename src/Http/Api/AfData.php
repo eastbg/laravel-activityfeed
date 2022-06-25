@@ -17,7 +17,7 @@ class AfData extends Controller
 
     public function targeting(Request $request)
     {
-        return AfHelper::getTargeting($request->get('table_name'));
+        return AfHelper::getTableTargeting($request->get('table_name'));
     }
 
     public function tables(Request $request)

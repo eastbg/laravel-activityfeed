@@ -1,11 +1,10 @@
-
 <script type="text/javascript">
 
     window.addEventListener('load', function () {
         targetingHide();
     })
 
-    const targetingHide = function(){
+    const targetingHide = function () {
         document.getElementById('targeting1').style.display = "none";
         document.getElementById('targeting2').style.display = "none";
         document.getElementById('targeting3').style.display = "none";
@@ -15,7 +14,7 @@
         document.getElementById('targeting_hidden').style.display = "inline";
     }
 
-    const targetingShow = function(){
+    const targetingShow = function () {
         document.getElementById('targeting1').style.display = "block";
         document.getElementById('targeting2').style.display = "block";
         document.getElementById('targeting3').style.display = "block";
@@ -64,11 +63,11 @@
     }
 
     textarea.form-control {
-        height:250px!important;
+        height: 250px !important;
     }
 
     small {
-        display: none!important;
+        display: none !important;
     }
 
     .af-code {
@@ -100,15 +99,17 @@
             <small>{!! $crud->getSubheading() ?? trans('backpack::crud.edit').' '.$crud->entity_name !!}.</small>
 
             @if ($crud->hasAccess('list'))
-                <small><a href="{{ url($crud->route) }}" class="d-print-none font-sm"><i class="la la-angle-double-{{ config('backpack.base.html_direction') == 'rtl' ? 'right' : 'left' }}"></i> {{ trans('backpack::crud.back_to_all') }} <span>{{ $crud->entity_name_plural }}</span></a></small>
+                <small><a href="{{ url($crud->route) }}" class="d-print-none font-sm"><i
+                                class="la la-angle-double-{{ config('backpack.base.html_direction') == 'rtl' ? 'right' : 'left' }}"></i> {{ trans('backpack::crud.back_to_all') }}
+                        <span>{{ $crud->entity_name_plural }}</span></a></small>
             @endif
         </h2>
     </section>
 @endsection
 
 @section('content')
+    <!-- Default box -->
     <div class="row">
-            <!-- Default box -->
 
         <div class="col-7">
             @include('crud::inc.grouped_errors')
@@ -126,12 +127,16 @@
                     <div class="mb-2 text-right">
                         <!-- Single button -->
                         <div class="btn-group">
-                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                {{trans('backpack::crud.language')}}: {{ $crud->model->getAvailableLocales()[request()->input('_locale')?request()->input('_locale'):App::getLocale()] }} &nbsp; <span class="caret"></span>
+                            <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
+                                {{trans('backpack::crud.language')}}
+                                : {{ $crud->model->getAvailableLocales()[request()->input('_locale')?request()->input('_locale'):App::getLocale()] }}
+                                &nbsp; <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu">
                                 @foreach ($crud->model->getAvailableLocales() as $key => $locale)
-                                    <a class="dropdown-item" href="{{ url($crud->route.'/'.$entry->getKey().'/edit') }}?_locale={{ $key }}">{{ $locale }}</a>
+                                    <a class="dropdown-item"
+                                       href="{{ url($crud->route.'/'.$entry->getKey().'/edit') }}?_locale={{ $key }}">{{ $locale }}</a>
                                 @endforeach
                             </ul>
                         </div>
@@ -148,11 +153,9 @@
                 @include('crud::inc.form_save_buttons')
             </form>
         </div>
-    </div>
-    <div class="col-5">
-        @include('af_feed::backpack.views.template-info')
+        <div class="col-5">
+            @include('af_feed::backpack.views.template-info')
+        </div>
     </div>
 
-    </div>
 @endsection
-

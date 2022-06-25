@@ -80,8 +80,7 @@ class AfTemplatesCrudController extends CrudController
     protected function setupCreateOperation()
     {
         //CRUD::setValidation(AfTemplatesRequest::class);
-        $this->crud->setEditView('backpack.views.template-create-form');
-        $this->crud->setCreateView('backpack.views.template-create-form');
+        $this->crud->setCreateView('af_feed::backpack.views.template-create-form');
 
         CRUD::field('name');
         $this->crud->field('enabled')->type('checkbox')->label('Enabled');
@@ -120,6 +119,7 @@ class AfTemplatesCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        $this->crud->setEditView('af_feed::backpack.views.template-edit-form');
         $this->setupCreateOperation();
     }
 }

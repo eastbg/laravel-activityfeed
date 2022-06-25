@@ -64,7 +64,17 @@
     <select name="relationship-browser" class="form-control" id="af-relationship-browser" onchange="afLoadRelationships();">
         <option value="">Loading .. </option>
     </select>
-    <div id="af-table-list"></div>
+    <div id="af-table-list" style="font-weight: bold;"></div>
+    <br>
+    Please note that the context of a rule is relevant when determining the relationships. As an example, if rule is triggered by database table "users",
+    you can follow relationships from that model.
+
+    Main model has a variable of the same name. <br><br>
+
+    Variable always has the models name (as in the above list). So if the notification is triggered from user model,
+    the email would be accessible from <b>@php echo('{{$user->email}}'); @endphp</b> and any related record through
+    relation name. So for example <b>@php echo('{{$user->team->name}}'); @endphp</b>.
+    If you can't see your models, make sure you've defined models path in the app config.
 </div>
 
 Templates are in Laravel Blade format. They are fed with var replacement and data replacement. Idea is that you can dump data from your database record and it's relations directly to the template. So you could define it like this:
@@ -87,10 +97,11 @@ And this (provided the correct relations exist):
     <br>
     You have a new notification, click <a href="{{$url ?? ''}}">here</a> to read it.
 </div>
-The variable replacement happens at save time and is "blind" so you should adjust your templates accordingly.
+The variable replacement happens at save time and is "blind" so you should adjust your templates accordingly and make sure you mark
+all variables as optional.
 <br><br>
-Rules define targeting and channels.
+Notification targeting and channels are defined by rules and custom scripts.
 <br><br>
 
-<a href="https://laravel.com/docs/9.x/blade">Blade Syntax</a>
+<a href="https://laravel.com/docs/9.x/blade" style="font-weight: bold;color:#2E3CA6;">Get to know the Blade syntax</a>
 

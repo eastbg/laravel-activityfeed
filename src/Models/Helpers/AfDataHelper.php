@@ -79,6 +79,13 @@ class AfDataHelper extends Model
             foreach ($table as $t) {
                 if (!stristr($t, 'af_')) {
 
+                    try {
+                        $class = config('af-config.af_model_path') . '\\' . $t;
+                        $reflector = new \ReflectionClass($class);
+                    } catch (\Throwable $e){
+                        continue;
+                    }
+
                     if (!empty($include) and in_array($t, $include)) {
                         $output[$t] = $t;
                     } elseif (!empty($exclude) and !in_array($t, $exclude)) {
@@ -86,7 +93,6 @@ class AfDataHelper extends Model
                     } elseif (empty($exclude) and empty($include)) {
                         $output[$t] = $t;
                     }
-
                 }
             }
 
@@ -126,7 +132,7 @@ class AfDataHelper extends Model
         return $output;
     }
 
-    public function getTargeting(string $table)
+    public function getTableTargeting(string $table)
     {
         $output = [];
 
@@ -141,6 +147,23 @@ class AfDataHelper extends Model
         }
 
         return $output;
+    }
+
+    public function getTargeting(string $table, string $rule_id)
+    {
+        $routings = $this->getRoutings();
+
+        foreach($routings as $tbl => $route){
+            if($tbl == $table){
+                foreach($route as $rule){
+                    if(isset($rule['id']) AND $rule['id'] == $rule_id){
+                        return $rule;
+                    }
+                }
+            }
+        }
+
+        return [];
     }
 
     public function getRoutings(): array
