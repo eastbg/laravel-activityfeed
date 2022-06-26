@@ -20,6 +20,7 @@ class CreateAfRulesTable extends Migration
             $table->bigInteger('id_category')->nullable()->unsigned();
             $table->bigInteger('id_template')->nullable()->unsigned();
             $table->bigInteger('id_master_template')->nullable()->unsigned();
+            $table->bigInteger('id_user_owner')->nullable()->unsigned();
 
             $table->string('rule_script')->nullable();
             $table->string('creator_script')->nullable();

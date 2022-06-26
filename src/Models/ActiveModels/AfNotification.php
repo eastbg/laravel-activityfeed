@@ -3,9 +3,6 @@
 namespace East\LaravelActivityfeed\Models\ActiveModels;
 
 use East\LaravelActivityfeed\Models\ActiveModelBase;
-use East\LaravelActivityfeed\Models\ActivityFeedBaseModel;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User;
 
 /**
  * @property integer $id
@@ -54,7 +51,7 @@ class AfNotification extends ActiveModelBase
      */
     public function recipient()
     {
-        return $this->belongsTo(User::class, 'id_user_recipient');
+        return $this->belongsTo(\App\ActivityFeed\AfUsersModel::class, 'id_user_recipient');
     }
 
     /**
@@ -78,6 +75,6 @@ class AfNotification extends ActiveModelBase
      */
     public function creator()
     {
-        return $this->belongsTo(User::class, 'id_user_creator');
+        return $this->belongsTo(\App\ActivityFeed\AfUsersModel::class, 'id_user_creator');
     }
 }

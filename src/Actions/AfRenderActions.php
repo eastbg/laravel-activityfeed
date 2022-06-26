@@ -51,7 +51,7 @@ class AfRenderActions extends Model
             ])->render();
         }
 
-        return view('af_feed::components.feed',['feed' => $items]);
+        return view('af_feed::af-components.feed',['feed' => $items]);
     }
 
     public function setUser($id){

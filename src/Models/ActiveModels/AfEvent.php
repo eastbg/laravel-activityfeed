@@ -57,7 +57,7 @@ class AfEvent extends ActiveModelBase
      */
     public function afRule()
     {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfRule', 'id_rule');
+        return $this->belongsTo(AfRule::class, 'id_rule');
     }
 
     /**
@@ -65,6 +65,6 @@ class AfEvent extends ActiveModelBase
      */
     public function creator()
     {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\User', 'id_user_creator');
+        return $this->belongsTo(\App\ActivityFeed\AfUsersModel::class, 'id_user_creator');
     }
 }

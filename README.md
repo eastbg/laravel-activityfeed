@@ -14,6 +14,14 @@ composer require east/laravel-activityfeed
 ```
 It is strongly recommended to have Laravel Backpack Pro version installed (https://backpackforlaravel.com/). The web interface for defining ruling and templates relies on Backpack and it will be hard to manage without it.
 
+### Important note about database
+This extension relies heavily on users table and requires you to have a column called "admin". The users model is published to make it easier to edit columns and relationships if you have customised the database. Note though that 
+```bash
+php artisan vendor:publish --force
+```
+will overwrite your changes to this model. So you can change this model to extend your existing user class.
+
+
 #### Run installer
 ```bash
 php artisan af:install
@@ -32,12 +40,13 @@ Template, rule etc. handling interfaces is based on Laravel Backpack. It's not i
 php artisan af:install_backpack
 ```
 
-### Recording events
+### Individual notifications
 
-Best way to use ActivityFeed is to extend your base model with ActivityFeedBaseModel. This allows the rules to hook into database events directly based on the rules that are tied to database tables. You can also use the facades directly in the following way:
+Best way to use ActivityFeed is to extend your base model with ActivityFeedBaseModel. This allows the rules to hook into database events directly based on the rules that are tied to database tables. You can also create notification directly. You still need to have a rule for this purpose, as rule defines the template. 
+
 
 ```php
-AfCreate::setTemplate('template-slug')   // mandatory
+AfNotify::setTemplate('template-slug')   // mandatory
   ->addChannel(['email'])          // additional channels
   ->setSubject('New message')      // optional, template defines this already
   ->setTarget('user')              // default: user

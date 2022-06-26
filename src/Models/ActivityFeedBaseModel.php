@@ -133,6 +133,7 @@ class ActivityFeedBaseModel extends Model
             ->whereTime('created_at', '>', Carbon::now()->subSeconds(config('af-config.repeat_events_grace')))
             ->get();
 
+
         if ($check->isNotEmpty()) {
             echo('is not empty');
             return false;

@@ -16,7 +16,7 @@ class ActivityFeedModel
             self::$random = rand(12,239329329329);
         }
 
-        return view('af_feed::components.feed',['random' => self::$random]);
+        return view('af_feed::af-components.feed',['random' => self::$random]);
     }
 
     public function loadRules(){

@@ -8,9 +8,10 @@ use East\LaravelActivityfeed\Console\Commands\Cache;
 use East\LaravelActivityfeed\Console\Commands\Generator;
 use East\LaravelActivityfeed\Console\Commands\Install;
 use East\LaravelActivityfeed\Console\Commands\Notify;
+use East\LaravelActivityfeed\Facades\AfNotify;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
-use East\LaravelActivityfeed\Models\Helpers\AfData;
 use East\LaravelActivityfeed\Models\Helpers\AfDataHelper;
+use East\LaravelActivityfeed\Models\Helpers\AfNotifyHelper;
 use East\LaravelActivityfeed\Models\Helpers\AfTemplateHelper;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Route;
@@ -39,41 +40,28 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             ]);
         }
 
-        $this->mergeConfigFrom(__DIR__ . '/../config/af-config.php', 'af_feed');
-        $this->mergeConfigFrom(__DIR__ . '/../config/af-database-targeting.php', 'af_feed');
+/*        $this->mergeConfigFrom(__DIR__ . '/../config/af-config.php', 'af_feed');
+        $this->mergeConfigFrom(__DIR__ . '/../config/af-database-targeting.php', 'af_feed');*/
         $this->publishConfig();
 
-        $this->loadViewsFrom(__DIR__.'/Resources/views', 'af_feed');
+        $this->loadViewsFrom(__DIR__.'/resources/views', 'af_feed');
         $this->loadMigrationsFrom(__DIR__ . '/Database/migrations');
 
         $this->publishes([
-            __DIR__ . '/Resources/css/af.css' => resource_path('css/af.css'),
+            __DIR__ . '/resources/css/af.css' => resource_path('css/af.css'),
+            __DIR__ . '/resources/js/af.js' => public_path('js/af.js'),
         ], 'asset');
 
-        $this->publishes([
-            __DIR__ . '/Resources/js/af.js' => public_path('js/af.js'),
-        ], 'asset');
-
-        $this->publishes([
-            __DIR__ . '/Resources/views/backpack/widgets/js.blade.php' => resource_path('views/vendor/backpack/base/widgets/js.blade.php'),
-        ], 'asset');
-
-        $this->publishes([
-            __DIR__ . '/Resources/views/backpack/' => resource_path('views/backpack/'),
-        ], 'asset');
+        $this->publishAssetDirectory(__DIR__.'/resources/css/');
+        $this->publishAssetDirectory(__DIR__.'/resources/js/');
+        $this->publishAssetDirectory(__DIR__.'/resources/views/');
 
         $this->publishes([
             __DIR__ . '/ActivityFeed/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
-        ], 'asset');
-
-        $this->publishes([
             __DIR__ . '/ActivityFeed/Creators/CreatorTemplate.php' => app_path('ActivityFeed/Creators/TeamToUser.php'),
-        ], 'asset');
-
-        $this->publishes([
             __DIR__ . '/ActivityFeed/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channels/Email.php'),
-        ], 'asset');
-
+            __DIR__ . '/ActivityFeed/AfUsersModel.php' => app_path('ActivityFeed/AfUsersModel.php'),
+        ], 'templates');
 
         $this->registerRoutes();
 
@@ -82,6 +70,39 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             $schedule->command('afpoll:run')->everyMinute();
         });
 
+    }
+
+    private function publishAssetDirectory($from){
+        $files = $this->getFileList($from);
+        $publish = [];
+
+        foreach($files as $file){
+            $file = substr($file,strpos($file,'src/')+4);
+            $source = __DIR__ .'/'.$file;
+            $publish[$source] = app_path('../'.$file);
+        }
+
+        if($publish){
+            $this->publishes($publish, 'asset');
+        }
+    }
+
+    private function getFileList($from,& $output=[]){
+        $files = scandir($from);
+
+        foreach ($files as $name) {
+            $path = $from.$name;
+
+            if($name == '.' OR $name == '..') {
+                continue;
+            }if(is_dir($path)){
+                $output = $this->getFileList($path.'/',$output);
+            } elseif(stristr($name,'.php') OR stristr($name,'.css') OR stristr($name,'.js')) {
+                $output[] = $path;
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -137,12 +158,20 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             return new AfDataHelper();
         });
 
+        $this->app->bind('af-notify', function () {
+            return new AfDataHelper();
+        });
+
         $this->app->singleton(AfCachingHelper::class, function () {
             return new AfCachingHelper();
         });
 
         $this->app->singleton(AfDataHelper::class, function () {
             return new AfDataHelper();
+        });
+
+        $this->app->singleton(AfNotifyHelper::class, function () {
+            return new AfNotifyHelper();
         });
 
     }
@@ -157,9 +186,6 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/af-config.php' => config_path('af-config.php'),
-            ], 'config');
-
-            $this->publishes([
                 __DIR__ . '/../config/af-database-targeting.php' => config_path('af-database-targeting.php'),
             ], 'config');
         }

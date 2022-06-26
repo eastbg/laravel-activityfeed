@@ -20,11 +20,14 @@ class AfRelationships extends Migration
 
         Schema::table('af_templates', function (Blueprint $table) {
             $table->foreign('id_category')->references('id')->on('af_categories')->onDelete('SET NULL');
+            $table->foreign('id_parent')->references('id')->on('af_templates')->onDelete('SET NULL');
         });
 
         Schema::table('af_rules', function (Blueprint $table) {
             $table->foreign('id_category')->references('id')->on('af_categories')->onDelete('SET NULL');
             $table->foreign('id_template')->references('id')->on('af_templates')->onDelete('SET NULL');
+            $table->foreign('id_master_template')->references('id')->on('af_templates')->onDelete('SET NULL');
+            $table->foreign('id_user_owner')->references('id')->on('users')->onDelete('SET NULL');
         });
 
         Schema::table('af_notifications', function (Blueprint $table) {
@@ -33,7 +36,6 @@ class AfRelationships extends Migration
             $table->foreign('id_rule')->references('id')->on('af_rules')->onDelete('CASCADE');
             $table->foreign('id_event')->references('id')->on('af_events')->onDelete('CASCADE');
         });
-
 
     }
 

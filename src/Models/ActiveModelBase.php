@@ -18,7 +18,19 @@ class ActiveModelBase extends Model
     use HasFactory;
     use CrudTrait;
 
+
+
     public function save(array $options = []){
+
+        $attributes = $this->getAttributes();
+
+        foreach($attributes as $key=>$attribute){
+            if(is_array($attribute)){
+                $this->setAttribute($key,json_encode($attribute));
+            }
+        }
+
+
         parent::save($options);
     }
 

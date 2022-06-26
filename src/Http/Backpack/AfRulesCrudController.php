@@ -9,6 +9,7 @@ use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
+use East\LaravelActivityfeed\Models\ActiveModels\Users;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
 
 /**
@@ -111,7 +112,8 @@ class AfRulesCrudController extends CrudController
                     'New record' => 'New record',
                     'Delete record' => 'Delete record',
                     'Field value' => 'Field value',
-                    'Custom script' => 'Custom script'
+                    'Custom script' => 'Custom script',
+                    'Manual notification' => 'Manual event from code',
                 ],
                 'onchange' => [
                     [
@@ -286,6 +288,22 @@ class AfRulesCrudController extends CrudController
                 'options' => AfTemplate::all()->pluck('name', 'id')->toArray()
             ]
         );
+
+        $this->crud->addField(
+            [
+                'name' => 'id_user_owner',
+                'tab' => 'Info',
+                'label' => 'Default owner',
+                'hint' => 'If this is selected the "from" of any message will always be from this user.',
+                'type' => 'select_from_array',
+                'options' => \App\ActivityFeed\AfUsersModel::where('admin','=',1)->pluck('name', 'id')->toArray(),
+                'wrapper' => [
+                    'class' => 'form-group col-md-12',
+                    'id' => 'w_owner'
+                ],
+            ]
+        );
+
 
         $this->crud->addField(
             [

@@ -54,6 +54,13 @@ function afTargetingDisplay(name) {
         document.getElementById("w_rule_operator").style.display = "block";
         document.getElementById("w_rule_script").style.display = "block";
         document.getElementById("w_rule_value").style.display = "block";
+    } else if (field.value === 'Manual notification'){
+        hideField('table_name');
+        hideField('field_name');
+        hideField('targeting');
+        hideField('rule_operator');
+        hideField('rule_script');
+        hideField('rule_value');
     } else {
         hideField('table_name');
         hideField('field_name');
@@ -67,10 +74,6 @@ function afTargetingDisplay(name) {
 
 function hideField(field){
     document.getElementById("w_"+field).style.display = "none";
-
-    if(document.getElementById(field)){
-        //document.getElementById(field).value = '';
-    }
 }
 
 

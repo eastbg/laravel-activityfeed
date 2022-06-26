@@ -39,7 +39,7 @@ class Install extends Command
      */
     public function handle()
     {
-        $sidebar = file_get_contents('vendor/east/laravel-activityfeed/src/Resources/views/sidemenu.blade.php');
+        $sidebar = file_get_contents('vendor/east/laravel-activityfeed/src/resources/views/af-sidemenu.blade.php');
         Artisan::call('backpack:add-sidebar-content',['code' => $sidebar]);
 
        // $schedule

@@ -40,9 +40,7 @@ class AfPoll extends Command
      */
     public function handle()
     {
-
         $obj = new AfPollAction();
         $obj->runPoll();
-
     }
 }

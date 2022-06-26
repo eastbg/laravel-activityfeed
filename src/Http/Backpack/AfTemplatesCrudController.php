@@ -7,6 +7,7 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
+use East\LaravelActivityfeed\Models\ActiveModels\Users;
 use East\LaravelActivityfeed\Requests\AfCategoriesRequest;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
 use East\LaravelActivityfeed\Requests\AfTemplatesRequest;
@@ -80,7 +81,7 @@ class AfTemplatesCrudController extends CrudController
     protected function setupCreateOperation()
     {
         //CRUD::setValidation(AfTemplatesRequest::class);
-        $this->crud->setCreateView('af_feed::backpack.views.template-create-form');
+        $this->crud->setCreateView('af_feed::backpack.af-views.template-create-form');
 
         CRUD::field('name');
         CRUD::field('description')->type('textarea');
@@ -115,6 +116,7 @@ class AfTemplatesCrudController extends CrudController
                 ],
             ]
         );
+
 
 
         $this->crud->addField(
@@ -171,7 +173,7 @@ class AfTemplatesCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
-        $this->crud->setEditView('af_feed::backpack.views.template-edit-form');
+        $this->crud->setEditView('af_feed::backpack.af-views.template-edit-form');
         $this->setupCreateOperation();
     }
 }
