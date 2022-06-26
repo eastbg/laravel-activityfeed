@@ -77,16 +77,25 @@ class AfRulesCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(AfRulesRequest::class);
+
+        $this->crud->addField([
+            'type' => 'custom_html',
+            'name' => 'scripts',
+            'tab' => 'Info',
+            'value' => "<script>window.addEventListener('load', function () {
+    afTargetingDisplay('rule_type');
+    afConfigureTableName();
+});</script>"]);
+
         $this->tabInfo();
         $this->tabSetup();
         $this->tabTargeting();
 
 
-
-        
     }
 
-    private function tabSetup(){
+    private function tabSetup()
+    {
 
         $this->crud->addField(
             [
@@ -222,7 +231,8 @@ class AfRulesCrudController extends CrudController
 
     }
 
-    private function tabTargeting(){
+    private function tabTargeting()
+    {
         $this->crud->field('to_admins')->type('checkbox')->label('Add to admins')->hint('Whether this notification is shown to admins.')->tab('Targeting');
 
         $this->crud->addField(
@@ -235,7 +245,7 @@ class AfRulesCrudController extends CrudController
                 'allow_multiple' => true,
                 'options' => AfHelper::getChannels(),
                 // optional
-                'inline'      => false, // show the radios all on the same line?
+                'inline' => false, // show the radios all on the same line?
             ]
         );
 
@@ -258,7 +268,8 @@ class AfRulesCrudController extends CrudController
 
     }
 
-    private function tabInfo(){
+    private function tabInfo()
+    {
 
         $this->crud->field('name')->tab('Info');
         $this->crud->field('enabled')->type('checkbox')->label('Enabled')->tab('Info');
@@ -275,6 +286,18 @@ class AfRulesCrudController extends CrudController
                 'options' => AfTemplate::all()->pluck('name', 'id')->toArray()
             ]
         );
+
+        $this->crud->addField(
+            [
+                'name' => 'id_parent',
+                'tab' => 'Info',
+                'label' => 'Parent template (optional)',
+                'hint' => 'You can define master template to "decorate" the actual template',
+                'type' => 'select_from_array',
+                'options' => AfTemplate::where('master_template', '=', 1)->pluck('name', 'id')->toArray()
+            ]
+        );
+
 
         $this->crud->addField(
             [

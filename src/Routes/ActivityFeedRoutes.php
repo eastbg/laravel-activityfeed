@@ -17,6 +17,5 @@ Route::group([
     Route::crud('af-events', 'AfEventsCrudController');
     Route::crud('af-rules', 'AfRulesCrudController');
     Route::crud('af-templates', 'AfTemplatesCrudController');
-    Route::crud('af-temp', 'AfTempCrudController');
    // Route::crud('af-templates/fetch', 'AfTemplatesCrudController');
 }); // this should be the absolute last line of this file

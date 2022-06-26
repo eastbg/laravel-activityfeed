@@ -21,6 +21,8 @@ class CreateAfTemplatesTable extends Migration
 
             $table->string('name')->nullable();
             $table->string('slug')->nullable();
+            $table->bigInteger('id_parent')->nullable()->unsigned();
+            $table->tinyInteger('master_template')->default(0);
 
             $table->text('description')->nullable();
 

@@ -59,7 +59,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         ], 'asset');
 
         $this->publishes([
-            __DIR__ . '/Resources/views/backpack/views/template-create-form.blade.php' => resource_path('views/backpack/views/template-create-form.blade.php'),
+            __DIR__ . '/Resources/views/backpack/' => resource_path('views/backpack/'),
         ], 'asset');
 
         $this->publishes([

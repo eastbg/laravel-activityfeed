@@ -1,49 +1,5 @@
 <script type="text/javascript">
 
-    window.addEventListener('load', function () {
-        targetingHide();
-    })
-
-    const targetingHide = function () {
-        document.getElementById('targeting1').style.display = "none";
-        document.getElementById('targeting2').style.display = "none";
-        document.getElementById('targeting3').style.display = "none";
-        document.getElementById('targeting4').style.display = "none";
-        document.getElementById('targeting5').style.display = "none";
-        document.getElementById('targeting_visible').style.display = "none";
-        document.getElementById('targeting_hidden').style.display = "inline";
-    }
-
-    const targetingShow = function () {
-        document.getElementById('targeting1').style.display = "block";
-        document.getElementById('targeting2').style.display = "block";
-        document.getElementById('targeting3').style.display = "block";
-        document.getElementById('targeting4').style.display = "block";
-        document.getElementById('targeting5').style.display = "block";
-        document.getElementById('targeting_visible').style.display = "inline";
-        document.getElementById('targeting_hidden').style.display = "none";
-    }
-
-    const fieldWirePreview = function ($field) {
-        let key = $field;
-        let params = {};
-        params[key] = document.getElementById(key).value;
-        Livewire.emit('updatePreview', params);
-    }
-
-    const fieldWireRecipients = function ($field) {
-        let key = $field;
-        let params = {};
-        params[key] = document.getElementById(key).value;
-        Livewire.emit('updateRecipients', params);
-    }
-
-    const fieldWireRecipients2 = function ($field) {
-        let key = $field;
-        let params = {};
-        params[key] = $('#' + key).select2('data');
-        Livewire.emit('updateRecipients', params);
-    }
 
 </script>
 
@@ -63,7 +19,7 @@
     }
 
     textarea.form-control {
-        height: 250px !important;
+        height: 120px !important;
     }
 
     small {

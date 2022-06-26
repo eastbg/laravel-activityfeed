@@ -1,7 +1,4 @@
-window.addEventListener('load', function () {
-    afTargetingDisplay('rule_type');
-    afConfigureTableName();
-})
+/*  */
 
 
 function afConfigureTableName(){

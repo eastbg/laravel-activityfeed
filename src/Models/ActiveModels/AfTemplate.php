@@ -23,6 +23,8 @@ use Illuminate\Support\Facades\Cache;
  * @property string $admin_template
  * @property string $url_template
  * @property boolean $enabled
+ * @property boolean $master_template
+ * @property AfTemplate $id_parent
  * @property AfCategory $afCategory
  * @property AfEvent[] $afEvents
  * @property AfNotification[] $afNotifications
@@ -48,7 +50,7 @@ class AfTemplate extends ActiveModelBase
      * @var array
      */
     protected $fillable = ['id_category', 'created_at', 'updated_at', 'name', 'slug','description',
-        'notification_template', 'email_subject',
+        'notification_template', 'email_subject','master_template','id_parent',
         'email_template', 'digest_template', 'admin_template',
         'enabled','url_template'];
 
@@ -82,6 +84,14 @@ class AfTemplate extends ActiveModelBase
     public function afRules()
     {
         return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfRule', 'id_template');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function afParent()
+    {
+        return $this->hasMany(AfTemplate::class, 'id_parent');
     }
 
     public function save(array $options = [])

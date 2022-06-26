@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Cache;
  * @property boolean $digestible
  * @property boolean $enabled
  * @property boolean $popup
+ * @property AfTemplate $afMasterTemplate
  * @property AfCategory $afCategory
  * @property AfTemplate $afTemplate
  * @property AfEvent[] $afEvents
@@ -82,6 +83,14 @@ class AfRule extends ActiveModelBase
     public function afTemplates()
     {
         return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfTemplate', 'id_template');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function afMasterTemplate()
+    {
+        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfTemplate', 'id_master_template');
     }
 
     /**
