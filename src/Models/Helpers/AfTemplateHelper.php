@@ -49,6 +49,7 @@ class AfTemplateHelper extends Model
                 @mkdir($template_path);
             }
 
+            file_put_contents($template_path.'/email-notification.blade.php',$template->email_template);
             file_put_contents($template_path.'/notification.blade.php',$template->notification_template);
             file_put_contents($template_path.'/admin-notification.blade.php',$template->admin_template);
         }

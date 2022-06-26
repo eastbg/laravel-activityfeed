@@ -61,7 +61,7 @@ class AfRenderActions extends Model
         }
 
         try {
-            $template = view('vendor.activity-feed.'.$template_id.'.notification',$vars)->render();
+            $template = view('vendor.activity-feed.'.$template_id.'.email-notification',$vars)->render();
         } catch (\Throwable $exception){
             $notification->afEvent->afRule->afTemplate->error = $exception->getMessage();
             $notification->afEvent->afRule->afTemplate->save();
@@ -79,7 +79,7 @@ class AfRenderActions extends Model
             $vars['content'] = $template;
 
             try {
-                $return = view('vendor.activity-feed.'.$master_template_id.'.notification',$vars)->render();
+                $return = view('vendor.activity-feed.'.$master_template_id.'.email-notification',$vars)->render();
             } catch (\Throwable $exception){
                 $notification->afEvent->afRule->afTemplate->afParent->error = $exception->getMessage();
                 $notification->afEvent->afRule->afTemplate->afParent->save();
