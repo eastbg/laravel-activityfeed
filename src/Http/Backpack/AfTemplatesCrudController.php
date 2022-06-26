@@ -7,7 +7,6 @@ use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
-use East\LaravelActivityfeed\Models\ActiveModels\Users;
 use East\LaravelActivityfeed\Requests\AfCategoriesRequest;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
 use East\LaravelActivityfeed\Requests\AfTemplatesRequest;
@@ -60,10 +59,9 @@ class AfTemplatesCrudController extends CrudController
     {
         CRUD::column('name');
         CRUD::column('enabled')->type('check');
-        CRUD::column('rule_type');
-        CRUD::column('rule');
-        CRUD::column('table_name');
-        CRUD::column('field_name');
+        CRUD::column('master_template')->type('check');
+        CRUD::column('slug');
+        CRUD::column('error');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -102,7 +100,6 @@ class AfTemplatesCrudController extends CrudController
             ]
         );
 
-
         $this->crud->addField(
             [
                 'name' => 'id_parent',
@@ -116,8 +113,6 @@ class AfTemplatesCrudController extends CrudController
                 ],
             ]
         );
-
-
 
         $this->crud->addField(
             [
@@ -148,11 +143,10 @@ class AfTemplatesCrudController extends CrudController
         CRUD::field('admin_template')->type('textarea')->label('Notification template for admins');
         CRUD::field('digest_template')->type('textarea')->label('Notification template for digest');
 
-
         $this->crud->addField(
             [
                 'name' => 'email_subject',
-                'label' => 'Email subject',
+                'label' => 'Email (or any other channel) subject',
                 'type' => 'text',
                 'wrapper' => [
                     'class' => 'form-group col-md-12',
@@ -161,7 +155,7 @@ class AfTemplatesCrudController extends CrudController
             ]
         );
 
-        CRUD::field('email_template')->type('textarea')->label('Email template');
+        CRUD::field('email_template')->type('textarea')->label('Email (or any other channel) template');
 
     }
 
@@ -173,6 +167,8 @@ class AfTemplatesCrudController extends CrudController
      */
     protected function setupUpdateOperation()
     {
+        $template = AfTemplate::find(request('id'));
+        $this->data['error_message'] = $template->error ?? '';
         $this->crud->setEditView('af_feed::backpack.af-views.template-edit-form');
         $this->setupCreateOperation();
     }

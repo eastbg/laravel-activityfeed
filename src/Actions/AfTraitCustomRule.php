@@ -54,7 +54,7 @@ trait AfTraitCustomRule {
         $obj = $this->createCustomRuleObj($rule);
 
         // see if event exists for this
-        $check = AfEvent::where('id_rule', '=', $rule->id)->where('processed','=',0)->with('AfRule')->get();
+        $check = AfEvent::where('id_rule', '=', $rule->id)->where('processed','=',0)->with('afRule')->get();
 
         foreach($check as $event){
             $this->handleEvent($event);

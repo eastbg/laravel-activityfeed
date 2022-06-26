@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Cache;
  * @property string $digest_template
  * @property string $admin_template
  * @property string $url_template
+ * @property string $error
  * @property boolean $enabled
  * @property boolean $master_template
  * @property AfTemplate $id_parent
@@ -51,7 +52,7 @@ class AfTemplate extends ActiveModelBase
      */
     protected $fillable = ['id_category', 'created_at', 'updated_at', 'name', 'slug','description',
         'notification_template', 'email_subject','master_template','id_parent',
-        'email_template', 'digest_template', 'admin_template',
+        'email_template', 'digest_template', 'admin_template','error',
         'enabled','url_template'];
 
     /**

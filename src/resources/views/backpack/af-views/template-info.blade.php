@@ -82,6 +82,7 @@
         window.addEventListener('load', function () {
             afLoadTables();
             afMasterTemplate();
+            afLoadUserRelationships();
         });
 
         function afMasterTemplateToggle() {
@@ -146,7 +147,19 @@
 
                 $('div#af-table-list').html(options.slice(0, -2));
             });
+        }
 
+        function afLoadUserRelationships() {
+            let url = '/af-data/relationships?table_name=AfUsers';
+            $.getJSON(url, function (data) {
+                var options = "";
+
+                $.each(data, function (key, val) {
+                    options = options + val + ", ";
+                });
+
+                $('div#af-table-list-users').html(options.slice(0, -2));
+            });
         }
 
         /*
@@ -176,15 +189,26 @@
     }
 </style>
 
+
 <div id="af-master">
     <h1 style="font-size: 22px;">Master templates</h1>
 
     Master templates are basically decorators. Important thing is to include in your master template a variable: <br>
     <br>
-    <b>@php echo('{!$content!}'); @endphp</b><br>
+    <b>@php echo('{!! $content !!}'); @endphp</b><br>
     <br>
     This single variable marks the space where the "real" template content will be put.
     For the time being, we are not supporting more advanced functionalities with master templates.
+    <br><br>
+    Additional objects that are available:
+    <br>
+    <b>$user</b> - Recipient user object<br>
+    <b>$creator</b> - Notification originator OR default owner, depending on the rule setup<br>
+
+    <br>
+    User object relationships:
+    <br>
+    <div id="af-table-list-users" style="font-weight: bold;color:#298A2D;"></div>
 </div>
 
 <div id="af-non-master">

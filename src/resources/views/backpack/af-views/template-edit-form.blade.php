@@ -18,6 +18,20 @@
         font-size: 32px;
     }
 
+    .af-error {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-color: #C32215;
+        border-width: 2px;
+        border-radius: 4px;
+        padding: 10px;
+    }
+
+    .af-error b {
+        color: #C32215;
+    }
+
+
     textarea.form-control {
         height: 120px !important;
     }
@@ -63,11 +77,23 @@
     </section>
 @endsection
 
+
+
 @section('content')
     <!-- Default box -->
     <div class="row">
 
         <div class="col-7">
+
+            @if(isset($error_message) AND $error_message)
+                <div class="af-error">
+                    <b>IMPORTANT: please check your template! While trying to create a notification, <br>
+                        the following error was encountered:</b><br>
+                    {{$error_message}}
+                </div>
+            @endif
+
+
             @include('crud::inc.grouped_errors')
 
             <form method="post"

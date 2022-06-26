@@ -4,6 +4,7 @@ namespace East\LaravelActivityfeed\Facades;
 
 use East\LaravelActivityfeed\Actions\AfRenderActions;
 use East\LaravelActivityfeed\Actions\AfTriggerActions;
+use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use Illuminate\Support\Facades\Facade;
 
 
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Facade;
  *
  * @method static AfRenderActions setUser(int $id)
  * @method static AfRenderActions getFeed()
+ * @method static AfRenderActions getMessage(AfNotification $notification)
  *
  * @package App\Facades
  */

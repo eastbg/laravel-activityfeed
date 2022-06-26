@@ -32,13 +32,79 @@ class AfRenderActions extends Model
         parent::__construct($attributes);
     }
 
+
+    /**
+     * @param AfNotification $notification
+     * @return string
+     */
+    public function getMessage(AfNotification $notification){
+        AfTemplating::compileTemplates();
+        $template_id = $notification->afEvent->afRule->afTemplate->id ?? null;
+        $master_template_id = $notification->afEvent->afRule->afTemplate->id_parent ?? null;
+        $parent_obj = $notification->afEvent->afRule->afTemplate->afParent ?? null;
+
+        $vars = [
+            'user' => $notification->recipient,
+            'creator' => $notification->creator,
+            'notification' => $notification
+        ];
+
+        // if we have a originating table & key for record, we'll load the object
+        if($notification->AfEvent->dbtable AND $notification->AfEvent->dbkey){
+            $class = config('af-config.af_model_path') . '\\' . $notification->AfEvent->dbtable;
+            if(class_exists($class)){
+                $obj = $class::find($notification->AfEvent->dbkey);
+                if($obj){
+                    $vars[$notification->AfEvent->dbtable] = $obj;
+                }
+            }
+        }
+
+        try {
+            $template = view('vendor.activity-feed.'.$template_id.'.notification',$vars)->render();
+        } catch (\Throwable $exception){
+            $notification->afEvent->afRule->afTemplate->error = $exception->getMessage();
+            $notification->afEvent->afRule->afTemplate->save();
+            return false;
+        }
+
+        if($notification->afEvent->afRule->afTemplate->error){
+            $notification->afEvent->afRule->afTemplate->error = null;
+            $notification->afEvent->afRule->afTemplate->save();
+        }
+
+        // if we have a master template, we'll load that also, sending the already
+        // loaded template as "content"
+        if($master_template_id){
+            $vars['content'] = $template;
+
+            try {
+                $return = view('vendor.activity-feed.'.$master_template_id.'.notification',$vars)->render();
+            } catch (\Throwable $exception){
+                $notification->afEvent->afRule->afTemplate->afParent->error = $exception->getMessage();
+                $notification->afEvent->afRule->afTemplate->afParent->save();
+                return false;
+            }
+
+            if(isset($parent_obj->error) AND $parent_obj->error){
+                $parent_obj->error = null;
+                $parent_obj->save();
+            }
+
+            return $return;
+        }
+
+        return $template;
+
+    }
+
     public function getFeed() {
         if(!$this->id_user) { $this->id_user = auth()->user()->id; } if(!$this->id_user){ return ''; }
 
         AfTemplating::compileTemplates();
 
         $feed = AfNotification::where('id_user_recipient','=',$this->id_user)->with([
-            'AfRule','recipient','creator','AfRule.AfTemplate'
+            'afRule','recipient','creator','afRule.afEvent','afRule.AfEvent.afTemplate'
         ])->get();
 
         $items = [];

@@ -31,7 +31,7 @@ class AfPollAction extends Model
     }
 
     private function sendMessages(){
-        $records = AfNotification::with('AfEvent','AfEvent.AfRule')->where('processed','=',0)->get();
+        $records = AfNotification::with('afEvent','afEvent.afRule','afEvent.afRule.afTemplate')->where('processed','=',0)->get();
         foreach($records as $record){
             //try {
 

@@ -2,7 +2,9 @@
 
 namespace East\LaravelActivityfeed\Models\Helpers;
 
+use App\ActivityFeed\AfUsersModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
+use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -116,13 +118,20 @@ class AfDataHelper extends Model
 
     public function getRelationships(string $table): array
     {
-        $class = config('af-config.af_model_path') . '\\' . $table;
+        if($table == 'AfUsers'){
+            $class = '\\'.AfUsers::class;
+        } else {
+            $class = config('af-config.af_model_path') . '\\' . $table;
+        }
+
         $reflector = new \ReflectionClass($class);
         $output = [];
         $exclude = ['booted', 'save', 'delete', 'update'];
 
         foreach ($reflector->getMethods() as $method) {
-            if (stristr($method->class, config('af-config.af_model_path'))) {
+            if($table == 'AfUsers' AND stristr($method->class,'Models\ActiveModels\AfUsers')){
+                $output[] = $method->name;
+            }elseif (stristr($method->class, config('af-config.af_model_path'))) {
                 if (!in_array($method->name, $exclude)) {
                     $output[] = $method->name;
                 }

@@ -12,4 +12,5 @@ return [
     'af_exclude_tables' => ['languages', 'sessions'], // you can exclude certain tables
     'af_model_path' => 'App\Models\Zoho\Modules\Models',
     'repeat_events_grace' => 1440,  // don't create similar events within the grace period
+    //'af_email_mailer' => Email
 ];

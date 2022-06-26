@@ -17,8 +17,10 @@ class AfTemplatesRequest extends FormRequest
         return backpack_auth()->check();
     }
 
+
     /**
      * Get the validation rules that apply to the request.
+     * todo: make sure that master templates have variable {!! $content !!} set
      *
      * @return array
      */
