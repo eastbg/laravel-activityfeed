@@ -169,6 +169,7 @@ class AfTemplatesCrudController extends CrudController
     {
         $template = AfTemplate::find(request('id'));
         $this->data['error_message'] = $template->error ?? '';
+        $this->data['id_parent'] = $template->id_parent ?? '';
         $this->crud->setEditView('af_feed::backpack.af-views.template-edit-form');
         $this->setupCreateOperation();
     }

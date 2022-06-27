@@ -33,7 +33,7 @@
 
 
     textarea.form-control {
-        height: 120px !important;
+        min-height: 120px !important;
     }
 
     small {

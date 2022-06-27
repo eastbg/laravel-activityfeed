@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Models\Helpers;
 
 use App\ActivityFeed\AfUsersModel;
+use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -154,19 +155,15 @@ class AfDataHelper extends Model
     }
 
     public function getTableClass(string $table){
-        if($table == 'AfUsers'){
+        if($table == 'AfUsers' OR $table == 'creator'){
             $class = '\\'.AfUsers::class;
+        } elseif($table == 'notification') {
+            $class = '\\'.AfNotification::class;
         } else {
             $class = config('af-config.af_model_path') . '\\' . $table;
         }
 
         return $class;
-
-        if(class_exists($class)){
-            return $class;
-        }
-
-        return null;
 
     }
 

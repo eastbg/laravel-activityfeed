@@ -33,7 +33,11 @@ class AfData extends Controller
 
     public function varReplacer(Request $request)
     {
-        return AfRender::mockVarReplacer($request->get('data'));
+        return AfRender::mockVarReplacer(
+            $request->get('data'),
+            $request->get('id'),
+            $request->get('template')
+        );
     }
 
     public function tableInfo(Request $request)

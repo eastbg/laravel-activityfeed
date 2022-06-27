@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static AfRenderActions setUser(int $id)
  * @method static AfRenderActions getFeed()
  * @method static AfRenderActions getMessage(AfNotification $notification)
- * @method static AfRenderActions mockVarReplacer($data)
+ * @method static AfRenderActions mockVarReplacer($data,$id,$template)
  *
  * @package App\Facades
  */

@@ -1,12 +1,11 @@
-<div style="border-color: #516d7b;border-width: 1px;border-radius: 4px;padding: 0 15px 15px 15px;margin-bottom: 20px;">
+<div class="af-box">
     <br><b></b><label>Browse table info</label></b>
     <select name="relationship-browser" class="form-control" id="af-relationship-browser"
             onchange="afLoadTableInfo();">
         <option value="">Loading ..</option>
     </select>
 
-    <div id="af-helpers" style="display:none;">
-
+    <div id="af-helpers" style="display:none;margin-top: 8px;">
         <ul class="nav nav-tabs">
             <li class="nav-item active">
                 <a class="nav-link" id="nav-relationships" aria-current="page" href="javascript:showRelationships();">Relationships</a>
@@ -34,7 +33,7 @@
     If you can't see your models, make sure you've defined models path in the app config.
 </div>
 
-<div style="border-color: #516d7b;border-width: 1px;border-radius: 4px;padding: 12px 15px 15px 15px;margin-bottom: 20px;margin-top: 15px;">
+<div class="af-box" style="margin-top: 20px;margin-bottom: 20px;">
     Always available variables, based on the notifications: <br><b>@php echo('{{$creator}}->');@endphp</b> - All
     fields
     of a user who initiated the notification event.
