@@ -139,9 +139,9 @@ class AfTemplatesCrudController extends CrudController
 
         CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
 
-        CRUD::field('notification_template')->type('textarea')->label('Notification template');
-        CRUD::field('admin_template')->type('textarea')->label('Notification template for admins');
-        CRUD::field('digest_template')->type('textarea')->label('Notification template for digest');
+        CRUD::field('notification_template')->type('af_textarea')->label('Notification template');
+        CRUD::field('admin_template')->type('af_textarea')->label('Notification template for admins');
+        CRUD::field('digest_template')->type('af_textarea')->label('Notification template for digest');
 
         $this->crud->addField(
             [
@@ -155,7 +155,7 @@ class AfTemplatesCrudController extends CrudController
             ]
         );
 
-        CRUD::field('email_template')->type('textarea')->label('Email (or any other channel) template');
+        CRUD::field('email_template')->type('af_textarea')->label('Email (or any other channel) template');
 
     }
 

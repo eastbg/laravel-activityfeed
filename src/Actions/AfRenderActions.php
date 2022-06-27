@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Actions;
 
 use App\Models\Email\Emailer;
+use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Facades\AfTemplating;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
@@ -30,6 +31,54 @@ class AfRenderActions extends Model
         }
 
         parent::__construct($attributes);
+    }
+
+
+
+    public function mockVarReplacer($data){
+
+        preg_match_all('/{{\$(.*?)}}/i', $data, $regs);
+        $parts = [];
+
+        foreach($regs as $key=>$val){
+            if(!stristr($val[0],'{{')){
+                $parts[] = $val[0];
+            }
+        }
+
+        foreach($parts as $k=>$part){
+            $path = explode('->',$part);
+            $obj = $this->getMockObject($path[0]);
+            $key = '{{$'.$part.'}}';
+
+            if($obj){
+                $pointer = $path[1];
+                $result = $obj->{$pointer} ?? null;
+                if($result){
+                    $replace[$key] = $obj->{$pointer};
+                    continue;
+                }
+            }
+
+            $replace[$key] = 'TABLE NOT FOUND!';
+        }
+
+        foreach($replace as $key=>$value){
+            $data = str_replace($key,$value,$data);
+        }
+
+        return json_encode($data);
+    }
+
+    public function getMockObject($table){
+        global $webhook;
+        $webhook = true;
+
+        $class = AfHelper::getTableClass($table);
+
+        if($class){
+            return $class::all()->first();
+        }
     }
 
 

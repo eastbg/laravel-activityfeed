@@ -141,6 +141,45 @@ class AfDataHelper extends Model
         return $output;
     }
 
+    public function getTableFields(string $table){
+        $obj = $this->getTableModel($table);
+        if(!$obj){ return []; }
+        $output = [];
+
+        foreach($obj->getFillable() as $attribute){
+            $output[] = $attribute;
+        }
+
+        return $output;
+    }
+
+    public function getTableClass(string $table){
+        if($table == 'AfUsers'){
+            $class = '\\'.AfUsers::class;
+        } else {
+            $class = config('af-config.af_model_path') . '\\' . $table;
+        }
+
+        return $class;
+
+        if(class_exists($class)){
+            return $class;
+        }
+
+        return null;
+
+    }
+
+    public function getTableModel(string $table){
+        $class = $this->getTableClass($table);
+
+        if(class_exists($class)){
+            return new $class;
+        }
+
+        return null;
+    }
+
     public function getTableTargeting(string $table)
     {
         $output = [];

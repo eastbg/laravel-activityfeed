@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static AfDataHelper getRules()
  * @method static AfDataHelper getTableRules($table,$rule_type)
  * @method static AfDataHelper getRelationships($table)
+ * @method static AfDataHelper getTableFields($table)
+ * @method static AfDataHelper getTableClass($table)
  *
  * @package App\Facades
  */

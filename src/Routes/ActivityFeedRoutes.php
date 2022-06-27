@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/af-data/tables', 'East\LaravelActivityfeed\Http\Api\AfData@tables');
 Route::get('/af-data/columns', 'East\LaravelActivityfeed\Http\Api\AfData@columns');
 Route::get('/af-data/relationships', 'East\LaravelActivityfeed\Http\Api\AfData@relationships');
+Route::get('/af-data/tableInfo', 'East\LaravelActivityfeed\Http\Api\AfData@tableInfo');
 Route::get('/af-data/targeting', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
+Route::get('/af-data/var-replacer', 'East\LaravelActivityfeed\Http\Api\AfData@varReplacer');
 //Route::get('/fetch/template', 'East\LaravelActivityfeed\Http\Api\AfData@targeting');
 
 Route::group([

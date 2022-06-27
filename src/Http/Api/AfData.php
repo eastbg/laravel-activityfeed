@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Http\Api;
 
 use East\LaravelActivityfeed\Facades\AfHelper;
+use East\LaravelActivityfeed\Facades\AfRender;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
@@ -28,5 +29,18 @@ class AfData extends Controller
     public function relationships(Request $request)
     {
         return AfHelper::getRelationships($request->get('table_name'));
+    }
+
+    public function varReplacer(Request $request)
+    {
+        return AfRender::mockVarReplacer($request->get('data'));
+    }
+
+    public function tableInfo(Request $request)
+    {
+        return [
+            'relations' => AfHelper::getRelationships($request->get('table_name')),
+            'fields' => AfHelper::getTableFields($request->get('table_name'))
+        ];
     }
 }
