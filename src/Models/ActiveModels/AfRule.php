@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Cache;
  * @property boolean $to_admins
  * @property boolean $background_job
  * @property boolean $digestible
+ * @property boolean $digesdelay
  * @property boolean $enabled
  * @property boolean $popup
  * @property AfTemplate $afMasterTemplate
@@ -51,7 +52,7 @@ class AfRule extends ActiveModelBase
     /**
      * @var array
      */
-    protected $fillable = ['id_category', 'id_template', 'created_at', 'updated_at', 'rule_script', 'creator_script', 'targeting', 'channels', 'name', 'description', 'rule_type', 'rule', 'table_name', 'field_name', 'rule_operator', 'rule_value', 'rule_actions', 'context', 'to_admins', 'background_job', 'digestible', 'enabled', 'popup'];
+    protected $fillable = ['id_category', 'id_template', 'created_at', 'updated_at', 'rule_script', 'creator_script', 'targeting', 'channels', 'name', 'description', 'rule_type', 'rule', 'table_name', 'field_name', 'rule_operator', 'rule_value', 'rule_actions', 'context', 'to_admins', 'background_job', 'digestible', 'digest_delay', 'enabled', 'popup'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

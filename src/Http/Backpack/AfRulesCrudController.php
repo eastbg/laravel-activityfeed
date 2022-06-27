@@ -277,6 +277,7 @@ class AfRulesCrudController extends CrudController
         $this->crud->field('enabled')->type('checkbox')->label('Enabled')->tab('Info');
         $this->crud->field('description')->type('textarea')->tab('Info');
         $this->crud->field('digestible')->type('checkbox')->label('Digestible')->hint('Email will be included in the digest as opposed to sending right away.')->tab('Info');
+        $this->crud->field('digest_delay')->type('text')->label('Digest delay')->hint('Value in seconds before trying to combine same event types.')->tab('Info');
         $this->crud->field('background_job')->type('checkbox')->label('Background Job')->hint('This rule is based on analysing database rather than reactive to table changes. For example: all users that have been inactive for more than a week.')->tab('Info');
 
         $this->crud->addField(

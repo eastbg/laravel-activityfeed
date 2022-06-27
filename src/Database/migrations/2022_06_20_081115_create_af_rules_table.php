@@ -46,6 +46,7 @@ class CreateAfRulesTable extends Migration
             $table->tinyInteger('to_admins')->default(0);
             $table->tinyInteger('background_job')->default(0);
             $table->tinyInteger('digestible')->default(0);
+            $table->bigInteger('digest_delay')->default(0);
             $table->tinyInteger('enabled')->default(0);
             $table->tinyInteger('popup')->default(0);
 
