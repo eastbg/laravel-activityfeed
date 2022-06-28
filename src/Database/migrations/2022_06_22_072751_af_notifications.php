@@ -23,6 +23,7 @@ class AfNotifications extends Migration
             $table->dateTime('expiry');
             $table->tinyInteger('sent')->default(0);
             $table->tinyInteger('read')->default(0);
+            $table->tinyInteger('digestible')->default(0);
             $table->tinyInteger('digested')->default(0);
             $table->tinyInteger('processed')->default(0);
         });

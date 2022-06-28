@@ -60,7 +60,9 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
             __DIR__ . '/ActivityFeed/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
             __DIR__ . '/ActivityFeed/Creators/CreatorTemplate.php' => app_path('ActivityFeed/Creators/TeamToUser.php'),
             __DIR__ . '/ActivityFeed/Channels/ChannelTemplate.php' => app_path('ActivityFeed/Channels/Email.php'),
-            __DIR__ . '/ActivityFeed/AfUsersModel.php' => app_path('ActivityFeed/AfUsersModel.php'),
+
+            // todo: verify that this goes right
+            __DIR__ . '/ActivityFeed/AfUsersModel.php' => config('af-config.af_model_path').'/AfUsersModel.php'
         ], 'templates');
 
         $this->registerRoutes();

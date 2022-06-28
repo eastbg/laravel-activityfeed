@@ -22,6 +22,7 @@ class AfDataHelper extends Model
     ];
 
     public $random;
+    public $rules;
 
     public function __construct(array $attributes = [])
     {
@@ -45,9 +46,12 @@ class AfDataHelper extends Model
     }
 
     public function getRules() : array {
+        if($this->rules){ return $this->rules; }
+
         $cache = Cache::get('af_rules');
 
         if($cache){
+            $this->rules = $cache;
             return $cache;
         }
 
@@ -67,6 +71,8 @@ class AfDataHelper extends Model
         }
 
         Cache::set('af_rules',$output);
+        $this->rules = $output;
+
         return $output;
     }
 
@@ -76,6 +82,9 @@ class AfDataHelper extends Model
         $output = [];
         $include = config('af-config.af_tables') ?? [];
         $exclude = config('af-config.af_exclude_tables') ?? [];
+
+        $output['AfNotification'] = 'AfNotification';
+        $output['AfUsers'] = 'AfUsers';
 
         foreach ($tables as $key => $table) {
 
@@ -98,7 +107,6 @@ class AfDataHelper extends Model
                     }
                 }
             }
-
         }
 
         return $output;
@@ -119,13 +127,7 @@ class AfDataHelper extends Model
 
     public function getRelationships(string $table): array
     {
-        if($table == 'AfUsers'){
-            $class = '\\'.AfUsers::class;
-        } else {
-            $class = config('af-config.af_model_path') . '\\' . $table;
-        }
-
-        $reflector = new \ReflectionClass($class);
+        $reflector = new \ReflectionClass($this->getTableClass($table));
         $output = [];
         $exclude = ['booted', 'save', 'delete', 'update'];
 
@@ -157,8 +159,8 @@ class AfDataHelper extends Model
     public function getTableClass(string $table){
         if($table == 'AfUsers' OR $table == 'creator'){
             $class = '\\'.AfUsers::class;
-        } elseif($table == 'notification') {
-            $class = '\\'.AfNotification::class;
+        } elseif($table == 'notification' OR $table == 'AfNotification') {
+            $class = AfNotification::class;
         } else {
             $class = config('af-config.af_model_path') . '\\' . $table;
         }

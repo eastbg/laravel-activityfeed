@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Log;
 
 trait AfTraitRuling {
 
-
     private function applyRules(AfEvent $record)
     {
 

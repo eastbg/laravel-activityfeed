@@ -4,7 +4,9 @@ namespace East\LaravelActivityfeed\Facades;
 
 use East\LaravelActivityfeed\Actions\AfRenderActions;
 use East\LaravelActivityfeed\Actions\AfTriggerActions;
+use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use Illuminate\Support\Facades\Facade;
 
 
@@ -15,6 +17,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static AfRenderActions getFeed()
  * @method static AfRenderActions getMessage(AfNotification $notification)
  * @method static AfRenderActions mockVarReplacer($data,$id,$template)
+ * @method static AfRenderActions renderTemplate(AfTemplate $template,$vars)
+ * @method static AfRenderActions eventObjectReplacement(AfEvent $event_obj,$vars=[])
  *
  * @package App\Facades
  */

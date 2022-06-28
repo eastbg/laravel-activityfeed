@@ -6,7 +6,9 @@ use App\Models\Email\Emailer;
 use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Facades\AfRender;
 use East\LaravelActivityfeed\Facades\AfTemplating;
+use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +27,7 @@ class AfRenderActions extends Model
 
     public function __construct(array $attributes = [])
     {
+        AfTemplating::compileTemplates();
         $this->cache = App::make(AfCachingHelper::class);
 
         if (!$this->cache->random) {
@@ -37,7 +40,6 @@ class AfRenderActions extends Model
 
     public function mockVarReplacer($data,$id=null,$template='')
     {
-
         preg_match_all('/{{\$(.*?)}}/i', $data, $regs);
         $parts = [];
         $replace = [];
@@ -102,17 +104,51 @@ class AfRenderActions extends Model
         }
     }
 
+    public function renderTemplate(AfTemplate $template,$vars){
+
+        $output = '';
+
+        try {
+            $output = view('vendor.activity-feed.' . $template->id . '.email-notification', $vars)->render();
+        } catch (\Throwable $exception) {
+            $template->error = $exception->getMessage();
+            $template->save();
+            return false;
+        }
+
+        if ($template->error) {
+            $template->error = null;
+            $template->save();
+        }
+
+        return $output;
+    }
+
+    public function eventObjectReplacement(AfEvent $event_obj,$vars=[]) : array {
+        // if we have a originating table & key for record, we'll load the object
+        if ($event_obj->dbtable AND $event_obj->dbkey) {
+            $class = config('af-config.af_model_path') . '\\' . $event_obj->dbtable;
+            if (class_exists($class)) {
+                $obj = $class::find($event_obj->dbkey);
+                if ($obj) {
+                    $vars[$event_obj->dbtable] = $obj;
+                }
+            }
+        }
+
+        return $vars;
+    }
 
     /**
      * @param AfNotification $notification
      * @return string
      */
-    public function getMessage(AfNotification $notification)
+    public function getMessage(AfNotification $notification) : string
     {
-        AfTemplating::compileTemplates();
-        $template_id = $notification->afEvent->afRule->afTemplate->id ?? null;
+        $template_obj = $notification->afEvent->afRule->afTemplate ?? null;
         $master_template_id = $notification->afEvent->afRule->afTemplate->id_parent ?? null;
         $parent_obj = $notification->afEvent->afRule->afTemplate->afParent ?? null;
+        $event_obj = $notification->afEvent ?? null;
 
         $vars = [
             'user' => $notification->recipient,
@@ -120,53 +156,21 @@ class AfRenderActions extends Model
             'notification' => $notification
         ];
 
-        // if we have a originating table & key for record, we'll load the object
-        if ($notification->AfEvent->dbtable and $notification->AfEvent->dbkey) {
-            $class = config('af-config.af_model_path') . '\\' . $notification->AfEvent->dbtable;
-            if (class_exists($class)) {
-                $obj = $class::find($notification->AfEvent->dbkey);
-                if ($obj) {
-                    $vars[$notification->AfEvent->dbtable] = $obj;
-                }
-            }
-        }
+        $vars = $this->eventObjectReplacement();
 
-        try {
-            $template = view('vendor.activity-feed.' . $template_id . '.email-notification', $vars)->render();
-        } catch (\Throwable $exception) {
-            $notification->afEvent->afRule->afTemplate->error = $exception->getMessage();
-            $notification->afEvent->afRule->afTemplate->save();
-            return false;
-        }
-
-        if ($notification->afEvent->afRule->afTemplate->error) {
-            $notification->afEvent->afRule->afTemplate->error = null;
-            $notification->afEvent->afRule->afTemplate->save();
-        }
+        $template = $this->renderTemplate($template_obj,$vars);
+        if(!$template){ return ''; }
 
         // if we have a master template, we'll load that also, sending the already
         // loaded template as "content"
         if ($master_template_id) {
             $vars['content'] = $template;
-
-            try {
-                $return = view('vendor.activity-feed.' . $master_template_id . '.email-notification', $vars)->render();
-            } catch (\Throwable $exception) {
-                $notification->afEvent->afRule->afTemplate->afParent->error = $exception->getMessage();
-                $notification->afEvent->afRule->afTemplate->afParent->save();
-                return false;
+            if($output = $this->renderTemplate($parent_obj,$vars)){
+                return $output;
             }
-
-            if (isset($parent_obj->error) and $parent_obj->error) {
-                $parent_obj->error = null;
-                $parent_obj->save();
-            }
-
-            return $return;
         }
 
         return $template;
-
     }
 
     public function getFeed()
@@ -177,8 +181,6 @@ class AfRenderActions extends Model
         if (!$this->id_user) {
             return '';
         }
-
-        AfTemplating::compileTemplates();
 
         $feed = AfNotification::where('id_user_recipient', '=', $this->id_user)->with([
             'afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.AfEvent.afTemplate'

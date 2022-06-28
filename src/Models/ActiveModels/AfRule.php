@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Cache;
  * @property boolean $to_admins
  * @property boolean $background_job
  * @property boolean $digestible
- * @property boolean $digesdelay
+ * @property boolean $digest_delay
  * @property boolean $enabled
  * @property boolean $popup
  * @property AfTemplate $afMasterTemplate

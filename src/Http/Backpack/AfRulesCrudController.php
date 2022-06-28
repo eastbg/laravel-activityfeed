@@ -51,8 +51,8 @@ class AfRulesCrudController extends CrudController
     {
         CRUD::column('name');
         CRUD::column('enabled')->type('check');;
+        CRUD::column('digestible')->type('check');;
         CRUD::column('rule_type');
-        CRUD::column('rule');
         CRUD::column('table_name');
         CRUD::column('field_name');
 

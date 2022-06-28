@@ -20,34 +20,66 @@ class AfPollAction extends Model
     use AfTraitCustomRule;
     use AfTraitRuling;
     use AfTraitSender;
+    use AfTraitDigestibles;
 
     public function runPoll()
     {
-
-        $this->sendMessages();
-        //$this->runCustomRules();
         //$this->runEvents();
+        //$this->runCustomRules();
+        $this->sendMessages();
         die();
     }
 
-    private function sendMessages(){
-        $records = AfNotification::with('afEvent','afEvent.afRule','afEvent.afRule.afTemplate')->where('processed','=',0)->get();
-        foreach($records as $record){
-            //try {
+    private function runEvents()
+    {
+        $records = AfEvent::where('processed', '=', '0')->with('afRule','afRule.afTemplate')->get();
 
-            $this->handleNotification($record);
-            //$record->processed = 1;
-            //$record->save();
-            /*            } catch (\Throwable $exception){
-                            Log::error('AF-NOTIFY: Could not run custom script '.$exception->getMessage());
-                        }{*/
+        foreach ($records as $record) {
+            if($record->digestible){
+                $this->handleDigestible($record);
+                $record->processed = 1;
+                $record->save();
+                continue;
+            } elseif ($record->afRule->to_admins) {
+                $this->addToAdmins($record);
+            }
+
+            $this->applyRules($record);
+            $record->processed = 1;
+            $record->save();
         }
     }
 
-    private function runCustomRules(){
-        $records = AfRule::where('rule_script','<>','')->where('enabled','=',1)->get();
+    private function sendMessages()
+    {
+        $records = AfNotification::with('afEvent', 'afEvent.afRule', 'afEvent.afRule.afTemplate')->where('processed', '=', 0)->get();
 
-        foreach($records as $record){
+        foreach ($records as $record) {
+            if ($record->afEvent->afRule->digestible and $record->afEvent->afRule->digest_delay) {
+                try {
+                    $this->handleDigestable($record);
+                    $record->processed = 1;
+                    $record->save();
+                } catch (\Throwable $exception) {
+                    Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
+                }
+            } else {
+                try {
+                    $this->handleNotification($record);
+                    $record->processed = 1;
+                    $record->save();
+                } catch (\Throwable $exception) {
+                    Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
+                }
+            }
+        }
+    }
+
+    private function runCustomRules()
+    {
+        $records = AfRule::where('rule_script', '<>', '')->where('enabled', '=', 1)->get();
+
+        foreach ($records as $record) {
             //try {
             $this->createCustomRule($record);
             /*            } catch (\Throwable $exception){
@@ -62,17 +94,5 @@ class AfPollAction extends Model
         }
     }
 
-    private function runEvents(){
-        $records = AfEvent::where('processed', '=', '0')->with('afRule')->get();
-        foreach ($records as $record) {
-            if ($record->afRule->to_admins) {
-                $this->addToAdmins($record);
-            }
-
-            $this->applyRules($record);
-            $record->processed = 1;
-            $record->save();
-        }
-    }
 
 }

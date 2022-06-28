@@ -139,9 +139,17 @@ class AfTemplatesCrudController extends CrudController
 
         CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
 
-        CRUD::field('notification_template')->type('af_textarea')->label('Notification template');
-        CRUD::field('admin_template')->type('af_textarea')->label('Notification template for admins');
-        CRUD::field('digest_template')->type('af_textarea')->label('Notification template for digest');
+        CRUD::field('notification_template')->type('af_textarea')->label('Notification template')
+            ->hint('Available variables: $user (AfUser) + $creator (AfUser) + $notification (AfNotification). 
+            In addition, if event has a relation to other model, it would be available with it\'s name ie. {{$Accounts->Account_Name}}');
+
+        CRUD::field('admin_template')->type('af_textarea')->label('Notification template for admins')
+            ->hint('Available variables: $user (recipient) + $creator + $notification. In addition, if 
+        event has a relation to other model, it would be available with it\'s name ie. {{$Accounts->Account_Name}}');
+
+        CRUD::field('digest_template')->type('af_textarea')->label('Notification template for digest')
+        ->hint('Available variables: $events (array of AfEvent objects) + $creator. In addition, if 
+        event has a relation to other model, it would be available with it\'s name ie. {{$Accounts->Account_Name}}');
 
         $this->crud->addField(
             [

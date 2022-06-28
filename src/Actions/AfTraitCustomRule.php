@@ -73,6 +73,7 @@ trait AfTraitCustomRule {
         $event->dbkey = $this->id;
         $event->operation = 'Custom';
         $event->dbfield = null;
+        $event->digestible = $rule->digestible;
 
         try {
             $event->save();

@@ -20,11 +20,13 @@ class CreateAfEventsTable extends Migration
             $table->bigInteger('id_user_creator')->nullable()->unsigned();
             $table->bigInteger('id_rule')->nullable()->unsigned();
             $table->tinyInteger('processed')->default(0);
+            $table->tinyInteger('digested')->default(0);
 
             $table->string('dbtable')->nullable();
             $table->bigInteger('dbkey')->nullable()->unsigned();
             $table->string('operation')->nullable();
             $table->string('field')->nullable();
+            $table->text('digest_content')->nullable();
 
             $table->index([
                 'processed'

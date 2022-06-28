@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $operation
  * @property string $dbfield
  * @property boolean $processed
+ * @property boolean $digested
+ * @property boolean $digestible
+ * @property string $digest_content
  * @property AfRule $afRule
  * @property User $creator
  */
@@ -36,7 +39,6 @@ class AfEvent extends ActiveModelBase
      */
     protected $keyType = 'integer';
 
-
     /**
      * @var array
      */
@@ -49,6 +51,9 @@ class AfEvent extends ActiveModelBase
         'dbtable',
         'dbkey',
         'operation',
+        'digested',
+        'digestible',
+        'digest_content',
         'dbfield'
     ];
 
