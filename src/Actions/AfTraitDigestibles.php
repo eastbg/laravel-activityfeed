@@ -10,7 +10,9 @@ use East\LaravelActivityfeed\Facades\AfTemplating;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
@@ -40,17 +42,17 @@ trait AfTraitDigestibles
     public function handleDigestible(AfEvent $event){
 
         // find other digestibles, the digesting time is determined by the first record
-        $records = AfEvent::where('processed', '=', '1')
-            ->where('digested','=','0')
+        $records = AfEvent::where('digested','=','0')
             ->where('digestible','=','1')
             ->where('id_rule', '=', $event->id_rule)
-            ->with('afRule','afRule.afTemplate')->get();
+            ->with('afRule','afRule.afTemplate','afRule.afTemplate.afParent')->get();
 
         foreach($records as $record){
-            $timing = Carbon::now()->subSeconds($record->afRule->digest_delay);
+            $timing = Carbon::now()->addSeconds($record->afRule->digest_delay)->toDateTimeString();
 
-            if($record->created > $timing){
+            if($record->created < $timing){
                 $this->digest($event,$records);
+                break;
             }
         }
     }
@@ -64,7 +66,7 @@ trait AfTraitDigestibles
      * @param array $records
      * @return void
      */
-    private function digest(AfEvent $event, array $records){
+    private function digest(AfEvent $event, Collection $records){
         $template = '';
 
         $vars = [
@@ -72,27 +74,37 @@ trait AfTraitDigestibles
             'events' => $records
         ];
 
+        $template_obj = $event->afRule->afTemplate;
+        $parent = AfTemplate::find($template_obj->id_parent);
+
         foreach ($records as $record) {
             $vars = AfRender::eventObjectReplacement($record,$vars);
-            $template .= AfRender::renderTemplate($event->afRule->afTemplate,$vars);
-            
-            try {
-                $record->delete();
-            } catch (\Throwable $exception){
-                Log::error('DIGEST PROBLEM: '.$exception->getMessage());
-            }
+            $template .= AfRender::renderTemplate($record->afRule->afTemplate,$vars,'digest-');
         }
 
         if($event->afRule->afTemplate->afParent()){
             $vars = [];
             $vars['content'] = $template;
-            $template = AfRender::renderTemplate($event->afRule->afTemplate->afParent,$vars);
+            $template = AfRender::renderTemplate($parent,$vars);
         }
 
         $event->digest_content = $template;
         $event->processed = 1;
         $event->digested = 1;
         $event->save();
+
+        foreach ($records as $record) {
+            if($record->id == $event->id){
+                continue;
+            }
+
+            try {
+                //$record->delete();
+            } catch (\Throwable $exception){
+                Log::error('DIGEST DELETION PROBLEM: '.$exception->getMessage());
+            }
+        }
+
     }
 
 

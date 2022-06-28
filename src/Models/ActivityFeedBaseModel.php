@@ -113,9 +113,12 @@ class ActivityFeedBaseModel extends Model
             $rules = AfHelper::getTableRules($this->getTable(), 'Record change');
             $operation = 'updated';
         } else {
-            $rules = AfHelper::getTableRules($this->getTable(), 'New Record');
+            $rules = AfHelper::getTableRules($this->getTable(), 'New record');
             $operation = 'created';
         }
+
+        // better have it saved so that we have the ID
+        parent::save();
 
         if ($rules) {
             foreach ($rules as $rule) {
@@ -123,7 +126,6 @@ class ActivityFeedBaseModel extends Model
             }
         }
 
-        parent::save();
     }
 
 }

@@ -75,7 +75,7 @@ class AfRule extends ActiveModelBase
      */
     public function afTemplate()
     {
-        return $this->belongsTo('East\LaravelActivityfeed\Models\ActiveModels\AfTemplate', 'id_template');
+        return $this->belongsTo(AfTemplate::class, 'id_template');
     }
 
     /**

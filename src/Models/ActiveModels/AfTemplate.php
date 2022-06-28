@@ -88,11 +88,11 @@ class AfTemplate extends ActiveModelBase
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function afParent()
     {
-        return $this->hasMany(AfTemplate::class, 'id_parent');
+        return $this->hasOne(AfTemplate::class, 'id_parent');
     }
 
     public function save(array $options = [])

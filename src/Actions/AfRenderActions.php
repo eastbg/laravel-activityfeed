@@ -104,19 +104,19 @@ class AfRenderActions extends Model
         }
     }
 
-    public function renderTemplate(AfTemplate $template,$vars){
+    public function renderTemplate(AfTemplate $template,$vars = [],$type='email-'){
 
         $output = '';
 
         try {
-            $output = view('vendor.activity-feed.' . $template->id . '.email-notification', $vars)->render();
+            $output = view('vendor.activity-feed.' . $template->id . '.'.$type.'notification', $vars)->render();
         } catch (\Throwable $exception) {
             $template->error = $exception->getMessage();
             $template->save();
             return false;
         }
 
-        if ($template->error) {
+        if ($output AND $template->error) {
             $template->error = null;
             $template->save();
         }

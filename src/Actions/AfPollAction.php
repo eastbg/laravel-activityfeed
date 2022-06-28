@@ -24,29 +24,30 @@ class AfPollAction extends Model
 
     public function runPoll()
     {
-        //$this->runEvents();
+        $this->runEvents();
         //$this->runCustomRules();
-        $this->sendMessages();
+        //$this->sendMessages();
         die();
     }
 
     private function runEvents()
     {
-        $records = AfEvent::where('processed', '=', '0')->with('afRule','afRule.afTemplate')->get();
+        $records = AfEvent::where('digestible', '=', '1')->where(
+            'digested','=', '0')->with('afRule','afRule.afTemplate')->get();
 
         foreach ($records as $record) {
             if($record->digestible){
                 $this->handleDigestible($record);
                 $record->processed = 1;
-                $record->save();
+                //$record->save();
                 continue;
             } elseif ($record->afRule->to_admins) {
-                $this->addToAdmins($record);
+                //$this->addToAdmins($record);
             }
 
-            $this->applyRules($record);
+/*            $this->applyRules($record);
             $record->processed = 1;
-            $record->save();
+            $record->save();*/
         }
     }
 

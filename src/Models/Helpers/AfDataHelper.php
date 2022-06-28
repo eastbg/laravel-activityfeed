@@ -38,6 +38,7 @@ class AfDataHelper extends Model
 
     public function getTableRules(string $table,string $rule_type) : array{
         $rules = $this->getRules();
+
         if(isset($rules[$table][$rule_type])){
             return $rules[$table][$rule_type];
         }
