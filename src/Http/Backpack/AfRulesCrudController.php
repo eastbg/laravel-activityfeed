@@ -77,6 +77,12 @@ class AfRulesCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
+
+
+        // todo: custom view & component which warns about possible missing
+        // variables when template + table have been selected
+        //$this->crud->setCreateView('af_feed::backpack.af-views.template-create-form');
+
         CRUD::setValidation(AfRulesRequest::class);
 
         $this->crud->addField([

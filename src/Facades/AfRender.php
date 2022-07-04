@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Facade;
  * Class AfRender
  *
  * @method static AfRenderActions setUser(int $id)
- * @method static AfRenderActions getFeed()
+ * @method static AfRenderActions getFeed($with_template=false)
+ * @method static AfRenderActions getFeedUnreadCount()
  * @method static AfRenderActions getMessage(AfNotification $notification)
  * @method static AfRenderActions mockVarReplacer($data,$id,$template)
  * @method static AfRenderActions renderTemplate(AfTemplate $template,$vars=[],$type='email-')

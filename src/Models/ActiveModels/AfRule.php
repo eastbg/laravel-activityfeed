@@ -105,6 +105,14 @@ class AfRule extends ActiveModelBase
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
+    public function afEvent()
+    {
+        return $this->hasMany(AfEvent::class, 'id_rule');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function afNotifications()
     {
         return $this->hasMany('East\LaravelActivityfeed\Models\ActiveModels\AfNotification', 'id_rule');

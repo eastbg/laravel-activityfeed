@@ -30,7 +30,6 @@ class ActiveModelBase extends Model
             }
         }
 
-
         parent::save($options);
     }
 

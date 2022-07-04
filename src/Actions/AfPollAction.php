@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Actions;
 
 use App\Models\Email\Emailer;
+use Carbon\Carbon;
 use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
@@ -22,34 +23,58 @@ class AfPollAction extends Model
     use AfTraitSender;
     use AfTraitDigestibles;
 
+    public static $regular_event_statuses = [''];
+
     public function runPoll()
     {
-        $this->runEvents();
+
+        do {
+            $ret = $this->runDigestibles();
+        } while ($ret);
+
+        // run normal events
+        $records = AfEvent::where('processed', '=', '0')
+            ->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')
+            ->get();
+
+        foreach($records as $record){
+            $this->handleEvent($record);
+            $this->addToAdmins($record);
+        }
+
         //$this->runCustomRules();
         //$this->sendMessages();
         die();
     }
 
-    private function runEvents()
+    /**
+     * @return bool
+     */
+    private function runDigestibles() : bool
     {
+
         $records = AfEvent::where('digestible', '=', '1')->where(
-            'digested','=', '0')->with('afRule','afRule.afTemplate')->get();
+            'digested', '=', '0')->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')->get();
 
         foreach ($records as $record) {
-            if($record->digestible){
+            $timing = Carbon::now()->addSeconds($record->afRule->digest_delay)->toDateTimeString();
+            if ($record->digestible and $record->created < $timing) {
                 $this->handleDigestible($record);
                 $record->processed = 1;
-                //$record->save();
-                continue;
-            } elseif ($record->afRule->to_admins) {
-                //$this->addToAdmins($record);
+                $record->save();
+                return true;
             }
-
-/*            $this->applyRules($record);
-            $record->processed = 1;
-            $record->save();*/
         }
+
+        return false;
     }
+
+    //$this->addToAdmins($record);
+
+    /*            $this->applyRules($record);
+                $record->processed = 1;
+                $record->save();*/
+
 
     private function sendMessages()
     {
@@ -58,7 +83,7 @@ class AfPollAction extends Model
         foreach ($records as $record) {
             if ($record->afEvent->afRule->digestible and $record->afEvent->afRule->digest_delay) {
                 try {
-                    $this->handleDigestable($record);
+                    $this->handledigestible($record);
                     $record->processed = 1;
                     $record->save();
                 } catch (\Throwable $exception) {

@@ -128,8 +128,10 @@ class AfRenderActions extends Model
         // if we have a originating table & key for record, we'll load the object
         if ($event_obj->dbtable AND $event_obj->dbkey) {
             $class = config('af-config.af_model_path') . '\\' . $event_obj->dbtable;
+
             if (class_exists($class)) {
                 $obj = $class::find($event_obj->dbkey);
+
                 if ($obj) {
                     $vars[$event_obj->dbtable] = $obj;
                 }
@@ -156,7 +158,7 @@ class AfRenderActions extends Model
             'notification' => $notification
         ];
 
-        $vars = $this->eventObjectReplacement();
+        $vars = $this->eventObjectReplacement($event_obj,$vars);
 
         $template = $this->renderTemplate($template_obj,$vars);
         if(!$template){ return ''; }
@@ -173,7 +175,21 @@ class AfRenderActions extends Model
         return $template;
     }
 
-    public function getFeed()
+    public function getFeedUnreadCount(){
+        if (!$this->id_user) {
+            $this->id_user = auth()->user()->id;
+        }
+
+        if (!$this->id_user) {
+            return 0;
+        }
+
+        return AfNotification::where('id_user_recipient', '=', $this->id_user)
+            ->where('read','=',0)
+            ->count();
+    }
+
+    public function getFeed($with_template=false)
     {
         if (!$this->id_user) {
             $this->id_user = auth()->user()->id;
@@ -189,14 +205,22 @@ class AfRenderActions extends Model
         $items = [];
 
         foreach ($feed as $item) {
-            $items[] = view('vendor.activity-feed.' . $item->AfRule->AfTemplate->id . '.notification', [
-                'recipient' => $item->recipient,
-                'creator' => $item->creator,
-                'notification' => $item
-            ])->render();
+            if($with_template){
+                $items[] = view('vendor.activity-feed.' . $item->AfRule->AfTemplate->id . '.notification', [
+                    'recipient' => $item->recipient,
+                    'creator' => $item->creator,
+                    'notification' => $item
+                ])->render();
+            } else {
+                $items[] = $item;
+            }
         }
 
-        return view('af_feed::af-components.feed', ['feed' => $items]);
+        if($with_template){
+            return view('af_feed::af-components.feed', ['feed' => $items]);
+        }
+
+        return $items;
     }
 
     public function setUser($id)

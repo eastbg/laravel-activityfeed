@@ -39,7 +39,7 @@ trait TraitAfBaseModel
     {
 
         if ($rule->digestible and $rule->digest_delay) {
-            return $this->handleDigestable($rule, $operation);
+            return $this->handledigestible($rule, $operation);
         }
 
         $check = AfEvent::where('id_rule', '=', $rule->id)
@@ -53,7 +53,7 @@ trait TraitAfBaseModel
         return $this->saveIndividualRule($rule, $operation);
     }
 
-    private function handleDigestable(AfRule $rule, string $operation)
+    private function handledigestible(AfRule $rule, string $operation)
     {
         return $this->saveIndividualRule($rule, $operation);
     }

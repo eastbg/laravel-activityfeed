@@ -33,7 +33,8 @@ class ActivityFeedBaseModel extends Model
     public function delete()
     {
         // get any custom rules
-        $rules = AfHelper::getTableRules($this->getTable(), 'Delete');
+        $rules = AfHelper::getTableRules($this->getTable(), 'Delete record');
+
 
         if ($rules) {
             foreach ($rules as $rule) {
@@ -85,11 +86,14 @@ class ActivityFeedBaseModel extends Model
 
         // create new record rule
         if (!$this->exists) {
-            $rules = AfHelper::getTableRules($this->getTable(), 'New Record');
+            $rules = AfHelper::getTableRules($this->getTable(), 'New record');
             $operation = 'created';
+
             foreach ($rules as $rule) {
+                // save first in order to have the ID available
+                parent::save();
+
                 if ($this->saveRule($rule, $operation)) {
-                    parent::save();
                     return;
                 }
             }
