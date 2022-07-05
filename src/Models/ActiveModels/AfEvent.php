@@ -80,6 +80,14 @@ class AfEvent extends ActiveModelBase
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function afTemplate()
+    {
+        return $this->belongsTo(AfTemplate::class, 'id_user_creator');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function Candidates_X_Technologies()
     {
         return $this->belongsTo(\App\Models\Zoho\Modules\BaseModelsCandidatesXTechnology::class, 'id_user_creator');

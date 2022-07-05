@@ -45,8 +45,8 @@ class AfTemplateHelper extends Model
 
         foreach($templates as $template){
             $template_path = $path.'/'.$template->id;
-            if(!is_dir($template)){
-                @mkdir($template_path);
+            if(!is_dir($template_path)){
+                @mkdir($template_path,0777,true);
             }
 
             file_put_contents($template_path.'/notification.blade.php',$template->notification_template);

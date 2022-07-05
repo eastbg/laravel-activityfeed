@@ -25,7 +25,7 @@ class CreateAfRulesTable extends Migration
             $table->string('rule_script')->nullable();
             $table->string('creator_script')->nullable();
 
-            $table->json('targeting')->nullable();
+            $table->text('targeting')->nullable();
             $table->json('channels')->nullable();
 
             $table->string('name')->nullable();
