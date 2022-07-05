@@ -1,7 +1,3 @@
-ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/views/backpack/fields/af_select_from_array.blade.php /Users/trailo/dev/vendors.east.fi/example-app/resources/views/vendor/backpack/crud/fields/af_select_from_array.blade.php
-ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/views/backpack/fields/af_select_multiple_json.blade.php /Users/trailo/dev/vendors.east.fi/example-app/resources/views/vendor/backpack/crud/fields/af_select_multiple_json.blade.php
-ln -s /Users/trailo/dev/vendors.east.fi/example-app/vendor/east/laravel-activityfeed/src/Resources/js/af.js /Users/trailo/dev/vendors.east.fi/example-app/public/js/af.js
-
 # laravel-activityfeed
 
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
