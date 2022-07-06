@@ -1,4 +1,4 @@
-@push('after_scripts')
+@push('before_scripts')
     <script>
 
         window.addEventListener('load', function () {
