@@ -21,11 +21,11 @@ class AfNotifications extends Migration
             $table->bigInteger('id_rule')->nullable()->unsigned();
             $table->bigInteger('id_event')->nullable()->unsigned();
             $table->dateTime('expiry')->nullable()->default(null);
-            $table->tinyInteger('sent')->default(0);
-            $table->tinyInteger('read')->default(0);
-            $table->tinyInteger('digestible')->default(0);
-            $table->tinyInteger('digested')->default(0);
-            $table->tinyInteger('processed')->default(0);
+            $table->tinyInteger('sent')->default(0)->nullable();
+            $table->tinyInteger('read')->default(0)->nullable();
+            $table->tinyInteger('digestible')->default(0)->nullable();
+            $table->tinyInteger('digested')->default(0)->nullable();
+            $table->tinyInteger('processed')->default(0)->nullable();
         });
     }
 

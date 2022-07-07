@@ -37,7 +37,7 @@ class CreateAfTemplatesTable extends Migration
             $table->text('admin_template')->nullable();
             $table->text('url_template')->nullable();
 
-            $table->tinyInteger('enabled')->default(0);
+            $table->tinyInteger('enabled')->default(1)->nullable();
         });
     }
 

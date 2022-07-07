@@ -158,12 +158,21 @@ class AfDataHelper extends Model
     }
 
     public function getTableClass(string $table){
-        if($table == 'AfUsers' OR $table == 'creator'){
-            $class = '\\'.AfUsers::class;
+
+        if($table == 'AfUsers' OR $table == 'creator' OR $table == 'user'){
+            if(class_exists('App\ActivityFeed\AfUsersModel')){
+                $class = 'App\ActivityFeed\AfUsersModel';
+            } elseif(class_exists(config('af-config.af_model_path'). '\\' . 'AfUsers')){
+                $class = 'App\ActivityFeed\AfUsers';
+            } elseif(class_exists('\\'.AfUsers::class)) {
+                $class = '\\'.AfUsers::class;
+            }
         } elseif($table == 'notification' OR $table == 'AfNotification') {
             $class = AfNotification::class;
-        } else {
+        } elseif(class_exists(config('af-config.af_model_path') . '\\' . $table)) {
             $class = config('af-config.af_model_path') . '\\' . $table;
+        } else {
+            return null;
         }
 
         return $class;

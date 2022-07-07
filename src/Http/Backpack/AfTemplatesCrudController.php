@@ -58,7 +58,7 @@ class AfTemplatesCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
-        CRUD::column('enabled')->type('check');
+        //CRUD::column('enabled')->type('check');
         CRUD::column('master_template')->type('check');
         CRUD::column('slug');
         CRUD::column('error');
@@ -84,7 +84,7 @@ class AfTemplatesCrudController extends CrudController
         CRUD::field('name');
         CRUD::field('description')->type('textarea');
 
-        $this->crud->field('enabled')->type('checkbox')->label('Enabled');
+        //$this->crud->field('enabled')->type('checkbox')->label('Enabled');
 
         $this->crud->addField(
             [
@@ -124,7 +124,7 @@ class AfTemplatesCrudController extends CrudController
         );
 
 
-        $this->crud->addField(
+/*        $this->crud->addField(
             [
                 'name' => 'url_template',
                 'label' => 'URL format',
@@ -135,7 +135,7 @@ class AfTemplatesCrudController extends CrudController
                     'id' => 'w_url_format'
                 ],
             ]
-        );
+        );*/
 
         CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
 

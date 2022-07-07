@@ -60,8 +60,6 @@ class AfPollAction extends Model
             $timing = Carbon::now()->addSeconds($record->afRule->digest_delay)->toDateTimeString();
             if ($record->digestible and $record->created < $timing) {
                 $this->handleDigestible($record);
-                $record->processed = 1;
-                $record->save();
                 return true;
             }
         }

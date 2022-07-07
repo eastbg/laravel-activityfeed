@@ -97,13 +97,12 @@ trait AfTraitCustomRule {
             $class = $class2;
         } else {
             Log::error('AF-NOTIFY: No class found for rule '.$rule_name);
-            echo(1);
             return false;
         }
 
         /* @var $obj \East\LaravelActivityfeed\ActivityFeed\Rules\RuleBase */
         $obj = new $class;
-        if(!method_exists($obj,'run')){ echo(2);  Log::error('AF-NOTIFY: No custom script method found for rule '.$rule_name); return false; }
+        if(!method_exists($obj,'run')){  Log::error('AF-NOTIFY: No custom script method found for rule '.$rule_name); return false; }
         return $obj;
     }
 

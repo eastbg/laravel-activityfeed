@@ -22,7 +22,7 @@ class CreateAfCategoriesTable extends Migration
             $table->text('description')->nullable();
             $table->string('ui_placement')->nullable();
 
-            $table->tinyInteger('enabled')->default(0);
+            $table->tinyInteger('enabled')->default(0)->nullable();
         });
 
     }

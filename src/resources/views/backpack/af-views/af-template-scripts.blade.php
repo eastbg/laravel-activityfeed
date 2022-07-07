@@ -1,4 +1,4 @@
-@push('before_scripts')
+
     <script>
 
         window.addEventListener('load', function () {
@@ -14,13 +14,11 @@
 
             if (indicator === "none") {
                 document.getElementById("w_parent_template").style.display = "block";
-                document.getElementById("w_url_format").style.display = "block";
                 document.getElementById("w_email_subject").style.display = "block";
                 document.getElementById("af-non-master").style.display = "block";
                 document.getElementById("af-master").style.display = "none";
             } else {
                 document.getElementById("w_parent_template").style.display = "none";
-                document.getElementById("w_url_format").style.display = "none";
                 document.getElementById("w_email_subject").style.display = "none";
                 document.getElementById("af-non-master").style.display = "none";
                 document.getElementById("af-master").style.display = "block";
@@ -35,13 +33,11 @@
                 document.getElementById("af-non-master").style.display = "none";
                 document.getElementById("w_email_subject").style.display = "none";
                 document.getElementById("af-master").style.display = "block";
-                document.getElementById("w_url_format").style.display = "none";
             } else {
                 document.getElementById("w_parent_template").style.display = "block";
                 document.getElementById("af-non-master").style.display = "block";
                 document.getElementById("w_email_subject").style.display = "block";
                 document.getElementById("af-master").style.display = "none";
-                document.getElementById("w_url_format").style.display = "block";
             }
         }
 
@@ -179,32 +175,6 @@
             });
         }
 
-/*
-        function afUpdatePreviews(){
-            let data = document.getElementById('admin_template').value;
-            data = varReplacer(data);
-            $('div#af-preview-admin').html(data);
-        }
-
-        function varReplacer(data){
-
-            let url = '/af-data/var-replacer';
-
-            let postfields = {
-                'data': data
-            }
-
-            $.getJSON(url, postfields, function (response) {
-                $('div#af-preview-admin').html(response);
-            });
-
-            return data;
-        }
-*/
-
-
-
-
         function afUpdatePreviews(){
             let nt = document.getElementById('notification_template').value;
             varReplacer(nt,'af-preview-notification','');
@@ -237,7 +207,7 @@
 
             let postfields = {
                 'data': data,
-                'id': {{$id_parent ?? null}},
+                'id': @if(isset($id_parent) AND $id_parent) {{$id_parent}} @else "" @endif,
                 'template': template
             }
 

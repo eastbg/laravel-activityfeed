@@ -12,6 +12,7 @@ use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
+use East\LaravelActivityfeed\Models\Helpers\AfDataHelper;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -71,14 +72,32 @@ trait AfTraitDigestibles
 
         $vars = [
             'creator' => $event->creator,
-            'events' => $records
+            'events' => $records,
+            'AfEvent' => $event,
+            'event' => $event
         ];
 
         $template_obj = $event->afRule->afTemplate;
         $parent = AfTemplate::find($template_obj->id_parent);
 
+        // we send the raw content of everything to parse the relevant replacements
+        $raw_content = $template_obj->id_parent
+            .$template_obj->email_subject
+            .$template_obj->email_template
+            .$template_obj->admin_template
+            .$template_obj->digest_template
+            .$template_obj->notification_template;
+
         foreach ($records as $record) {
-            $vars = AfRender::eventObjectReplacement($record,$vars);
+            $class = AfHelper::getTableClass($record->dbtable);
+
+            if(class_exists($class)){
+                $obj = $class::find($record->dbkey);
+                $vars[$record->dbtable] = $obj;
+                $vars = AfRender::varReplacer($obj,$raw_content,$vars);
+            }
+
+            $tmp = AfRender::renderTemplate($record->afRule->afTemplate,$vars,'digest-');
             $template .= AfRender::renderTemplate($record->afRule->afTemplate,$vars,'digest-');
         }
 
@@ -87,6 +106,8 @@ trait AfTraitDigestibles
             $vars['content'] = $template;
             $template = AfRender::renderTemplate($parent,$vars);
         }
+
+        print_r($template);die();
 
         $event->digest_content = $template;
         $event->processed = 1;

@@ -43,12 +43,12 @@ class CreateAfRulesTable extends Migration
             $table->string('rule_actions')->nullable();
             $table->string('context')->nullable();
 
-            $table->tinyInteger('to_admins')->default(0);
-            $table->tinyInteger('background_job')->default(0);
-            $table->tinyInteger('digestible')->default(0);
-            $table->bigInteger('digest_delay')->default(0);
-            $table->tinyInteger('enabled')->default(0);
-            $table->tinyInteger('popup')->default(0);
+            $table->tinyInteger('to_admins')->default(0)->nullable();
+            $table->tinyInteger('background_job')->default(0)->nullable();
+            $table->tinyInteger('digestible')->default(0)->nullable();
+            $table->bigInteger('digest_delay')->default(0)->nullable();
+            $table->tinyInteger('enabled')->default(0)->nullable();
+            $table->tinyInteger('popup')->default(0)->nullable();
 
             $table->index([
                 'to_admins','background_job','digestible','enabled'

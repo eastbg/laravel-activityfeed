@@ -56,6 +56,10 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         $this->publishAssetDirectory(__DIR__.'/resources/js/');
         $this->publishAssetDirectory(__DIR__.'/resources/views/');
 
+        $path = str_replace('\\','/',config('af-config.af_model_path'));
+
+        //echo($path);die();
+
         $this->publishes([
             __DIR__ . '/ActivityFeed/Rules/RuleTemplate.php' => app_path('ActivityFeed/Rules/RulePost.php'),
             __DIR__ . '/ActivityFeed/Creators/CreatorTemplate.php' => app_path('ActivityFeed/Creators/TeamToUser.php'),
