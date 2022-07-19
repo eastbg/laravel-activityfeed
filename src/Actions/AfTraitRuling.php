@@ -110,34 +110,5 @@ trait AfTraitRuling {
     }
 
 
-    private function addToAdmins($record)
-    {
-        $users = \App\ActivityFeed\AfUsersModel::where('admin', '=', 1)->get();
-        foreach ($users as $user) {
-            $this->addToUser($user->id, $record);
-        }
-    }
-
-
-    private function addToUser(int $id, AfEvent $record)
-    {
-        // not adding to user that created it
-        if ($id == $record->id_user_creator) {
-            return false;
-        }
-
-        $obj = new AfNotification();
-        $obj->id_user_recipient = $id;
-        $obj->id_user_creator = $record->id_user_creator;
-        $obj->id_rule = $record->id_rule;
-        $obj->id_event = $record->id;
-        try {
-            $obj->save();
-        } catch (\Throwable $exception) {
-            Log::error('AF-NOTIFY: '.$exception->getMessage());
-        }
-    }
-
-
 
 }

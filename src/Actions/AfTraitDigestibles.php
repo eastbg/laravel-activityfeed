@@ -69,6 +69,7 @@ trait AfTraitDigestibles
      */
     private function digest(AfEvent $event, Collection $records){
         $template = '';
+        $digest = '';
 
         $vars = [
             'creator' => $event->creator,
@@ -94,23 +95,26 @@ trait AfTraitDigestibles
             if(class_exists($class)){
                 $obj = $class::find($record->dbkey);
                 $vars[$record->dbtable] = $obj;
-                $vars = AfRender::varReplacer($obj,$raw_content,$vars);
+
+                // make sure the variable array is "reset" for each record
+                $new_vars = AfRender::varReplacer($obj,$raw_content,$vars);
             }
 
-            $tmp = AfRender::renderTemplate($record->afRule->afTemplate,$vars,'digest-');
-            $template .= AfRender::renderTemplate($record->afRule->afTemplate,$vars,'digest-');
+            $digest .= AfRender::renderTemplate($record->afRule->afTemplate,$new_vars,'digest-');
         }
+
+        $vars['digest'] = $digest;
+        $template = AfRender::renderTemplate($record->afRule->afTemplate,$vars,'');
 
         if($event->afRule->afTemplate->afParent()){
             $vars = [];
             $vars['content'] = $template;
-            $template = AfRender::renderTemplate($parent,$vars);
+            $template = AfRender::renderTemplate($parent,$vars,'');
         }
 
-        print_r($template);die();
-
+        // note: this does not create notifications, only the event
         $event->digest_content = $template;
-        $event->processed = 1;
+        $event->processed = 0;
         $event->digested = 1;
         $event->save();
 

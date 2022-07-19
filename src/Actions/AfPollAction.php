@@ -22,12 +22,14 @@ class AfPollAction extends Model
     use AfTraitRuling;
     use AfTraitSender;
     use AfTraitDigestibles;
+    use AfTraitNotificationAdd;
 
     public static $regular_event_statuses = [''];
 
     public function runPoll()
     {
 
+        // digestable events
         do {
             $ret = $this->runDigestibles();
         } while ($ret);
@@ -38,13 +40,18 @@ class AfPollAction extends Model
             ->get();
 
         foreach($records as $record){
+            // means it's digestable, but not yet digested, so we skip it
+            if($record->digestible AND !$record->digested){
+                continue;
+            }
+
             $this->handleEvent($record);
             $this->addToAdmins($record);
+            $record->processed = 1;
         }
 
         //$this->runCustomRules();
         //$this->sendMessages();
-        die();
     }
 
     /**
@@ -115,6 +122,38 @@ class AfPollAction extends Model
             /*            } catch (\Throwable $exception){
                             Log::error('AF-NOTIFY: Could not run custom script '.$exception->getMessage());
                         }*/
+        }
+    }
+
+
+
+    private function addToAdmins($record)
+    {
+        $users = \App\ActivityFeed\AfUsersModel::where('admin', '=', 1)->get();
+
+        foreach ($users as $user) {
+            $this->addToUser($user->id, $record);
+        }
+    }
+
+
+    private function addToUser(int $id, AfEvent $record)
+    {
+        // not adding to user that created it
+        if ($id == $record->id_user_creator) {
+            return false;
+        }
+
+        $obj = new AfNotification();
+        $obj->id_user_recipient = $id;
+        $obj->id_user_creator = $record->id_user_creator;
+        $obj->id_rule = $record->id_rule;
+        $obj->id_event = $record->id;
+
+        try {
+            $obj->save();
+        } catch (\Throwable $exception) {
+            Log::error('AF-NOTIFY: '.$exception->getMessage());
         }
     }
 

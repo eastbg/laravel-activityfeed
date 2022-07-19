@@ -21,16 +21,21 @@ use Illuminate\Support\Facades\Log;
  * 3. Feed items are just entries in the database, external sends are handled by another cron (afpoll:send)
  * */
 
-trait AfTraitCustomRule {
+trait AfTraitCustomRule
+{
 
     /** Launched by cron:AfPollAction - creates events
      * @param AfRule $rule
      * @return false|void
      */
-    public function createCustomRule(AfRule $rule){
+
+    public function createCustomRule(AfRule $rule)
+    {
 
         $obj = $this->createCustomRuleObj($rule);
-        if(!$obj){ return false; }
+        if (!$obj) {
+            return false;
+        }
 
         // see if event exists for this
         $check = AfEvent::where('id_rule', '=', $rule->id)
@@ -38,7 +43,9 @@ trait AfTraitCustomRule {
             ->get();
 
         // event exists, exit
-        if(!$check->isEmpty()){ return false; }
+        if (!$check->isEmpty()) {
+            return false;
+        }
 
         // if no event, create it
         $this->createEvent($rule);
@@ -49,24 +56,22 @@ trait AfTraitCustomRule {
      * @param AfRule $rule
      * @return void
      */
-    public function runCustomRuleEvents(AfRule $rule){
+    public function runCustomRuleEvents(AfRule $rule)
+    {
 
         $obj = $this->createCustomRuleObj($rule);
 
         // see if event exists for this
-        $check = AfEvent::where('id_rule', '=', $rule->id)->where('processed','=',0)->with('afRule')->get();
+        $check = AfEvent::where('id_rule', '=', $rule->id)->where('processed', '=', 0)->with('afRule')->get();
 
-        foreach($check as $event){
+        foreach ($check as $event) {
             $this->handleEvent($event);
         }
     }
 
-    private function handleEvent(AfEvent $event){
 
-    }
-
-
-    private function createEvent(AfRule $rule){
+    private function createEvent(AfRule $rule)
+    {
         $event = new AfEvent();
         $event->id_rule = $rule->id;
         $event->dbtable = null;
@@ -77,8 +82,8 @@ trait AfTraitCustomRule {
 
         try {
             $event->save();
-        } catch (\Throwable $e){
-            Log::log('error',$e->getMessage());
+        } catch (\Throwable $e) {
+            Log::log('error', $e->getMessage());
         }
     }
 
@@ -86,23 +91,27 @@ trait AfTraitCustomRule {
      * @param AfRule $rule
      * @return \East\LaravelActivityfeed\ActivityFeed\Rules\RuleBase|false
      */
-    private function createCustomRuleObj(AfRule $rule){
+    private function createCustomRuleObj(AfRule $rule)
+    {
         $rule_name = $rule->name;
-        $class1 = 'App\ActivityFeed\Rules\\'.$rule->rule_script;
-        $class2 = 'East\LaravelActivityfeed\ActivityFeed\Rules\\'.$rule->rule_script;
+        $class1 = 'App\ActivityFeed\Rules\\' . $rule->rule_script;
+        $class2 = 'East\LaravelActivityfeed\ActivityFeed\Rules\\' . $rule->rule_script;
 
-        if(class_exists($class1)){
+        if (class_exists($class1)) {
             $class = $class1;
-        } elseif(class_exists($class2)){
+        } elseif (class_exists($class2)) {
             $class = $class2;
         } else {
-            Log::error('AF-NOTIFY: No class found for rule '.$rule_name);
+            Log::error('AF-NOTIFY: No class found for rule ' . $rule_name);
             return false;
         }
 
         /* @var $obj \East\LaravelActivityfeed\ActivityFeed\Rules\RuleBase */
         $obj = new $class;
-        if(!method_exists($obj,'run')){  Log::error('AF-NOTIFY: No custom script method found for rule '.$rule_name); return false; }
+        if (!method_exists($obj, 'run')) {
+            Log::error('AF-NOTIFY: No custom script method found for rule ' . $rule_name);
+            return false;
+        }
         return $obj;
     }
 

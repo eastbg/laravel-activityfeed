@@ -18,8 +18,6 @@ class ActiveModelBase extends Model
     use HasFactory;
     use CrudTrait;
 
-
-
     public function save(array $options = []){
 
         $attributes = $this->getAttributes();
@@ -33,6 +31,20 @@ class ActiveModelBase extends Model
         parent::save($options);
     }
 
+    /**
+     * @param Model $object
+     * @return bool|mixed
+     */
+    private function getRelationType($object, $method)
+    {
+        if(!method_exists($object, $method)){ return false; }
+        $oReflectionClass = new \ReflectionClass($object);
+        $method = $oReflectionClass->getMethod($method);
+        $type = get_class($method->invoke($object));
+        if(!$type){ return false; }
+        $type = explode('\\', $type);
+        return is_array($type) ? end($type) : false;
+    }
 
 }
 
