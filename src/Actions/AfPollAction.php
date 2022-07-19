@@ -45,9 +45,15 @@ class AfPollAction extends Model
                 continue;
             }
 
-            $this->handleEvent($record);
-            $this->addToAdmins($record);
+            try {
+                $this->handleEvent($record);
+                $this->addToAdmins($record);
+            } catch (\Throwable $exception){
+
+            }
+
             $record->processed = 1;
+            $record->save();
         }
 
         //$this->runCustomRules();
