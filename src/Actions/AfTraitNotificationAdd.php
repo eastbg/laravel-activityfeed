@@ -31,22 +31,11 @@ trait AfTraitNotificationAdd
      */
     private function handleEvent(AfEvent $event)
     {
-        $targeting = $event->afRule->targeting ?? null;;
         $to_admins = $event->afRule->to_admins ?? null;
 
         // add to admins
         if($to_admins){ $this->addToAdmins($event); }
-
-        if (!$targeting) {
-            return false;
-        }
-
-        $rule = AfHelper::getTargeting($event->afRule->table_name, $targeting);
-        $class = AfHelper::getTableClass($event->dbtable);
-        $obj = $class::find($event->dbkey);
-
-        // get the user records
-        $list = $this->relationIterator($obj, $rule['relations']);
+        $list = $this->getEventTargeting($event);
 
         foreach($list as $user){
 
@@ -57,6 +46,21 @@ trait AfTraitNotificationAdd
 
             $this->addToUser($user->id,$event);
         }
+    }
+
+    private function getEventTargeting(AfEvent $event) {
+        $targeting = $event->afRule->targeting ?? null;;
+
+        if (!$targeting) {
+            return false;
+        }
+
+        $rule = AfHelper::getTargeting($event->afRule->table_name, $targeting);
+        $class = AfHelper::getTableClass($event->dbtable);
+        $obj = $class::find($event->dbkey);
+
+        // get the user records
+        return $this->relationIterator($obj, $rule['relations']);
     }
 
     /**

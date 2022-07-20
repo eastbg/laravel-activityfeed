@@ -34,21 +34,38 @@ class AfPollAction extends Model
             $ret = $this->runDigestibles();
         } while ($ret);
 
+        /* custom rules
+
+        1. Find all active rules
+        2. Check individual rule:
+            - are criteria met for the run (asking the custom script)
+            - check grace period
+            - create event - custom script does this
+        3. Process event - get users and check for each
+            - are maximum number of notifications already sent?
+            - is the grace period exceeded?
+            - has the parent rule finished
+            - are there any custom limiters provided by the custom scripts
+        */
+        do {
+            $ret = $this->runCustomRules();
+        } while ($ret);
+
         // run normal events
         $records = AfEvent::where('processed', '=', '0')
-            ->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')
+            ->with('afRule', 'afRule.afTemplate', 'afRule.afTemplate.afParent')
             ->get();
 
-        foreach($records as $record){
+        foreach ($records as $record) {
             // means it's digestable, but not yet digested, so we skip it
-            if($record->digestible AND !$record->digested){
+            if ($record->digestible and !$record->digested) {
                 continue;
             }
 
             try {
                 $this->handleEvent($record);
                 $this->addToAdmins($record);
-            } catch (\Throwable $exception){
+            } catch (\Throwable $exception) {
 
             }
 
@@ -56,18 +73,17 @@ class AfPollAction extends Model
             $record->save();
         }
 
-        //$this->runCustomRules();
         //$this->sendMessages();
     }
 
     /**
      * @return bool
      */
-    private function runDigestibles() : bool
+    private function runDigestibles(): bool
     {
 
         $records = AfEvent::where('digestible', '=', '1')->where(
-            'digested', '=', '0')->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')->get();
+            'digested', '=', '0')->with('afRule', 'afRule.afTemplate', 'afRule.afTemplate.afParent')->get();
 
         foreach ($records as $record) {
             $timing = Carbon::now()->addSeconds($record->afRule->digest_delay)->toDateTimeString();
@@ -117,6 +133,31 @@ class AfPollAction extends Model
         $records = AfRule::where('rule_script', '<>', '')->where('enabled', '=', 1)->get();
 
         foreach ($records as $record) {
+            if(!$object = $this->createCustomRuleObj($record)){ continue; }
+
+            try {
+                if(!$object->shouldRun($record)){ continue; }
+                if(!$event = $object->createEvent($record)) { continue; }
+            } catch (\Throwable $exception){
+                // todo: add error display also to rules, not only on templates
+                Log::error('AF-NOTIFY: Failed with a custom script on notification ' . $record->name);
+                continue;
+            }
+
+            $users = $this->getEventTargeting($event);
+
+            foreach($users as $user){
+                if($object->canRunUser($event,$user)){
+                    $this->addToUser($user->id,$event);
+                }
+            }
+
+            $event->processed = 1;
+            $event->save();
+
+
+
+
             //try {
             $this->createCustomRule($record);
             /*            } catch (\Throwable $exception){
@@ -130,7 +171,6 @@ class AfPollAction extends Model
                         }*/
         }
     }
-
 
 
     private function addToAdmins($record)
@@ -159,7 +199,7 @@ class AfPollAction extends Model
         try {
             $obj->save();
         } catch (\Throwable $exception) {
-            Log::error('AF-NOTIFY: '.$exception->getMessage());
+            Log::error('AF-NOTIFY: ' . $exception->getMessage());
         }
     }
 
