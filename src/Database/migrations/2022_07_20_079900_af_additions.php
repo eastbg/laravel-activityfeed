@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAfEventsTable extends Migration
+class AfAdditions extends Migration
 {
     /**
      * Run the migrations.
@@ -13,25 +13,19 @@ class CreateAfEventsTable extends Migration
      */
     public function up()
     {
-        Schema::create('af_events', function (Blueprint $table) {
+        Schema::table('af_rules', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-
+            $table->bigInteger('id_user_recipient')->nullable()->unsigned();
             $table->bigInteger('id_user_creator')->nullable()->unsigned();
             $table->bigInteger('id_rule')->nullable()->unsigned();
-            $table->tinyInteger('processed')->default(0);
-            $table->tinyInteger('digested')->default(0);
+            $table->bigInteger('id_event')->nullable()->unsigned();
+            $table->dateTime('expiry')->nullable()->default(null);
+            $table->tinyInteger('sent')->default(0)->nullable();
+            $table->tinyInteger('read')->default(0)->nullable();
             $table->tinyInteger('digestible')->default(0)->nullable();
-
-            $table->string('dbtable')->nullable();
-            $table->bigInteger('dbkey')->nullable()->unsigned();
-            $table->string('operation')->nullable();
-            $table->string('field')->nullable();
-            $table->text('digest_content')->nullable();
-
-            $table->index([
-                'processed'
-            ]);
+            $table->tinyInteger('digested')->default(0)->nullable();
+            $table->tinyInteger('processed')->default(0)->nullable();
         });
     }
 
@@ -42,6 +36,6 @@ class CreateAfEventsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('af_events');
+        //
     }
 }

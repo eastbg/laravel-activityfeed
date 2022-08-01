@@ -16,6 +16,7 @@ use East\LaravelActivityfeed\Models\ActiveModelBase;
  * @property boolean $sent
  * @property boolean $read
  * @property boolean $digested
+ * @property boolean $digestible
  * @property boolean $processed
  * @property User $creator
  * @property AfRule $afRule
@@ -43,7 +44,7 @@ class AfNotification extends ActiveModelBase
      */
     protected $fillable = ['id_user_recipient', 'id_user_creator', 'id_template','id_event',
         'id_rule', 'id_category', 'created_at', 'updated_at', 'channels', 'notification_subject',
-        'notification_template', 'email_subject', 'email_template', 'digest_subject', 'digest_template',
+        'notification_template', 'email_subject', 'email_template', 'digest_subject', 'digest_template','digestible',
         'admin_subject', 'admin_template', 'expiry', 'sent', 'read', 'digest', 'digested', 'processed', 'popup'];
 
     /**
