@@ -25,6 +25,7 @@ class CreateAfEventsTable extends Migration
 
             $table->string('dbtable')->nullable();
             $table->bigInteger('dbkey')->nullable()->unsigned();
+            $table->bigInteger('dbfield')->nullable()->unsigned();
             $table->string('operation')->nullable();
             $table->string('field')->nullable();
             $table->text('digest_content')->nullable();

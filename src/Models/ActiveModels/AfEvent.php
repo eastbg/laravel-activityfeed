@@ -78,6 +78,14 @@ class AfEvent extends ActiveModelBase
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notifications()
+    {
+        return $this->hasMany(AfNotification::class, 'id_event');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function afTemplate()
