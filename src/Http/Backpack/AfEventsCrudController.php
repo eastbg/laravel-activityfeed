@@ -28,7 +28,6 @@ class AfEventsCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /**
      * Configure the CrudPanel object. Apply settings to all operations.
@@ -73,7 +72,6 @@ class AfEventsCrudController extends CrudController
     protected function setupCreateOperation()
     {
         CRUD::setValidation(AfEventsRequest::class);
-
         CRUD::field('id');
         CRUD::field('created_at');
         CRUD::field('updated_at');
@@ -83,6 +81,7 @@ class AfEventsCrudController extends CrudController
         CRUD::field('description');
         CRUD::field('rule_type');
         CRUD::field('rule');
+        CRUD::field('slug');
         CRUD::field('table_name');
         CRUD::field('field_name');
         CRUD::field('rule_operator');

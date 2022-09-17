@@ -42,7 +42,7 @@ class AfRenderActions extends Model
      *
      * @param $baseobj
      * @param $data string
-     * @param $debug bool
+     * @param $vars array
      * @return string
      */
     public function varReplacer($baseobj, $data, $vars = []) : array
@@ -64,6 +64,27 @@ class AfRenderActions extends Model
 
         return $vars;
     }
+
+    public function getRenderedNotification(AfEvent $record){
+
+        $class = AfHelper::getTableClass($record->dbtable);
+        $template_obj = $record->afRule->afTemplate;
+        $new_vars = [];
+
+        if(class_exists($class)){
+            $obj = $class::find($record->dbkey);
+
+            if($obj){
+                $vars[$record->dbtable] = $obj;
+
+                // make sure the variable array is "reset" for each record
+                $new_vars = AfRender::varReplacer($obj,$template_obj->notification_template,$vars);
+            }
+        }
+
+        return AfRender::renderTemplate($record->afRule->afTemplate,$new_vars,'');
+    }
+
 
     private function extractReplacementParts($data)
     {
@@ -302,7 +323,7 @@ class AfRenderActions extends Model
         }
 
         $feed = AfNotification::where('id_user_recipient', '=', $this->id_user)->with([
-            'afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.AfEvent.afTemplate'
+            'afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate','afEvent'
         ])->get();
 
         $items = [];
@@ -315,9 +336,16 @@ class AfRenderActions extends Model
                     'notification' => $item
                 ])->render();
             } else {
-                $items[] = $item;
+                $items[] = [
+                    'link' => str_replace('{id}',$item->afEvent->dbkey,$item->AfRule->AfTemplate->url_template),
+                    'short_message' => $item->AfRule->AfTemplate->notification_template,
+                    'time' => $item->created_at,
+                    'read' => $item->read,
+                    'id' => $item->id
+                ];
             }
         }
+
 
         if ($with_template) {
             return view('af_feed::af-components.feed', ['feed' => $items]);

@@ -24,7 +24,6 @@ class AfTemplatesCrudController extends CrudController
     use \Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
-    use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;
 
     /*    use \Backpack\CRUD\app\Http\Controllers\Operations\InlineCreateOperation;
     use \Backpack\CRUD\app\Http\Controllers\Operations\FetchOperation;*/
@@ -124,7 +123,7 @@ class AfTemplatesCrudController extends CrudController
         );
 
 
-/*        $this->crud->addField(
+        $this->crud->addField(
             [
                 'name' => 'url_template',
                 'label' => 'URL format',
@@ -135,7 +134,7 @@ class AfTemplatesCrudController extends CrudController
                     'id' => 'w_url_format'
                 ],
             ]
-        );*/
+        );
 
         CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
 

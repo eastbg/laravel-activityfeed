@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property boolean $digestible
  * @property string $digest_content
  * @property AfRule $afRule
+ * @property AfTemplate $afTemplate
  * @property User $creator
  */
 class AfEvent extends ActiveModelBase
@@ -86,11 +87,11 @@ class AfEvent extends ActiveModelBase
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
      */
     public function afTemplate()
     {
-        return $this->belongsTo(AfTemplate::class, 'id_user_creator');
+        return $this->hasOneThrough(AfTemplate::class, AfRule::class,'id_template','id');
     }
 
     /**
