@@ -324,7 +324,7 @@ class AfRenderActions extends Model
 
         $feed = AfNotification::where('id_user_recipient', '=', $this->id_user)->with([
             'afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate','afEvent'
-        ])->get();
+        ])->where('read','=',0)->orderBy('id','DESC')->get();
 
         $items = [];
 
