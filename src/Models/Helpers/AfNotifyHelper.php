@@ -22,6 +22,8 @@ class AfNotifyHelper extends Model
     private $dbfield;
     private $dbkey;
 
+    private $extra_html;
+
 
     public function add(string $rule_slug) : bool{
 
@@ -36,6 +38,7 @@ class AfNotifyHelper extends Model
         $obj->digestible = $this->digestible;
         $obj->dbtable = $this->dbtable;
         $obj->dbkey = $this->dbkey;
+        $obj->html = $this->extra_html;
         $obj->id_rule = $rule->id;
 
         try {
@@ -65,6 +68,16 @@ class AfNotifyHelper extends Model
     public function setDbKey(int $dbkey) : AfNotifyHelper
     {
         $this->dbkey = $dbkey;
+        return $this;
+    }
+
+    /**
+     * @param mixed $dbkey
+     * @return AfNotifyHelper
+     */
+    public function setExtraHtml(string $html) : AfNotifyHelper
+    {
+        $this->extra_html = $html;
         return $this;
     }
 

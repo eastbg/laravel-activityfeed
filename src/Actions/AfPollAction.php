@@ -8,10 +8,12 @@ use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
+use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
@@ -64,9 +66,8 @@ class AfPollAction extends Model
 
             try {
                 $this->handleEvent($record);
-                $this->addToAdmins($record);
             } catch (\Throwable $exception) {
-
+                Log::error('AF-NOTIFY: Error handling an event ' . $exception->getMessage());
             }
 
             $record->processed = 1;
@@ -133,12 +134,18 @@ class AfPollAction extends Model
         $records = AfRule::where('rule_script', '<>', '')->where('enabled', '=', 1)->get();
 
         foreach ($records as $record) {
-            if(!$object = $this->createCustomRuleObj($record)){ continue; }
+            if (!$object = $this->createCustomRuleObj($record)) {
+                continue;
+            }
 
             try {
-                if(!$object->shouldRun($record)){ continue; }
-                if(!$event = $object->createEvent($record)) { continue; }
-            } catch (\Throwable $exception){
+                if (!$object->shouldRun($record)) {
+                    continue;
+                }
+                if (!$event = $object->createEvent($record)) {
+                    continue;
+                }
+            } catch (\Throwable $exception) {
                 // todo: add error display also to rules, not only on templates
                 Log::error('AF-NOTIFY: Failed with a custom script on notification ' . $record->name);
                 continue;
@@ -146,16 +153,14 @@ class AfPollAction extends Model
 
             $users = $this->getEventTargeting($event);
 
-            foreach($users as $user){
-                if($object->canRunUser($event,$user)){
-                    $this->addToUser($user->id,$event);
+            foreach ($users as $user) {
+                if ($object->canRunUser($event, $user)) {
+                    $this->addToUser($user->id, $event);
                 }
             }
 
             $event->processed = 1;
             $event->save();
-
-
 
 
             //try {
@@ -185,6 +190,7 @@ class AfPollAction extends Model
 
     private function addToUser(int $id, AfEvent $record)
     {
+
         // not adding to user that created it
         if ($id == $record->id_user_creator) {
             return false;
@@ -201,6 +207,24 @@ class AfPollAction extends Model
         } catch (\Throwable $exception) {
             Log::error('AF-NOTIFY: ' . $exception->getMessage());
         }
+
+        if ($record->afRule->afTemplate->email_template) {
+            $user = AfUsers::find($id);
+            $email = $user->email;
+            $content = $record->afRule->afTemplate->email_template . $record->html;
+            $subject = $record->afRule->afTemplate->email_subject;
+
+            if ($user) {
+                \Mail::html($content, function ($message) use ($email, $subject) {
+                    /* @var Message $message */
+                    $message
+                        ->to($email)
+                        ->from('beast@east.fi')
+                        ->subject($subject);
+                });
+            }
+        }
+
     }
 
 

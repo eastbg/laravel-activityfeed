@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $dbtable
  * @property string $operation
  * @property string $dbfield
+ * @property string $html
  * @property boolean $processed
  * @property boolean $digested
  * @property boolean $digestible
@@ -59,7 +60,8 @@ class AfEvent extends ActiveModelBase
         'digested',
         'digestible',
         'digest_content',
-        'dbfield'
+        'dbfield',
+        'html'
     ];
 
     /**

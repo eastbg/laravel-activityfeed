@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $Mobile
  * @property string $Title
  * @property string $Gift_address
+ * @property string $group
  * @property boolean $admin
  * @property Account $account
  * @property AfEvent[] $afEvents
@@ -48,7 +49,7 @@ class AfUsers extends ActiveModelBase
     /**
      * @var array
      */
-    protected $fillable = ['id_zoho_account', 'name', 'id_zoho', 'invitation', 'email', 'email_verified_at', 'password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'current_team_id', 'profile_photo_path', 'created_at', 'updated_at', 'Mobile', 'Title', 'Gift_address', 'admin'];
+    protected $fillable = ['id_zoho_account', 'name', 'id_zoho', 'invitation', 'email', 'email_verified_at', 'password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'current_team_id', 'profile_photo_path', 'created_at', 'updated_at', 'Mobile', 'Title', 'Gift_address', 'admin','group'];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
