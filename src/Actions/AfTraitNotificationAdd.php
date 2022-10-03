@@ -31,36 +31,22 @@ trait AfTraitNotificationAdd
      */
     private function handleEvent(AfEvent $event)
     {
-        $to_admins = $event->afRule->to_admins ?? null;
+        $rule = AfHelper::getTargeting($event->dbtable,$event->afRule->id);
+        $class = AfHelper::getTableClass($event->dbtable);
+        $obj = $class::find($event->dbkey);
 
-        // add to admins
-        if($to_admins){ $this->addToAdmins($event); }
-        $list = $this->getEventTargeting($event);
+        // get the user records
+        $list = $this->relationIterator($obj, $rule['relations']);
 
         foreach($list as $user){
 
             // not to add a duplicate to admins
-            if(isset($user->admin) AND $user->admin AND $to_admins){
+            if(isset($user->admin) AND $user->admin == 1 AND $event->afRule->to_admins){
                 continue;
             }
 
             $this->addToUser($user->id,$event);
         }
-    }
-
-    private function getEventTargeting(AfEvent $event) {
-        $targeting = $event->afRule->targeting ?? null;;
-
-        if (!$targeting) {
-            return false;
-        }
-
-        $rule = AfHelper::getTargeting($event->afRule->table_name, $targeting);
-        $class = AfHelper::getTableClass($event->dbtable);
-        $obj = $class::find($event->dbkey);
-
-        // get the user records
-        return $this->relationIterator($obj, $rule['relations']);
     }
 
     /**
@@ -70,26 +56,85 @@ trait AfTraitNotificationAdd
      * @param $collection
      * @return array|mixed
      */
-    private function relationIterator($object, $relation_rules, $collection = [])
+    private function relationIterator($object,$relation_rules)
     {
+
+        $list = [];
+        $output = [];
+
+        foreach ($relation_rules as $rule){
+
+            if($list){
+                foreach ($list as $list_item){
+                    $output[] = $list_item->$rule;
+                }
+
+                continue;
+            }
+
+            if(is_object($object->$rule) AND get_class($object->$rule) == 'Illuminate\Database\Eloquent\Collection'){
+                foreach($object->$rule as $item){
+                    $list[] = $item;
+                }
+
+                continue;
+            }
+
+            $object = $object->$rule;
+
+/*
+            print_r(get_class($object->$rule));
+            $object = $object->$rule;*/
+        }
+
+        return $output;
+        //print_r($list);
+        print_r($output[0]->id_zoho);
+
+
+        die();
+
+
+
+/*
         if(empty($relation_rules)){ return $collection; }
         $pointer = array_shift($relation_rules);
         if(!isset($object->$pointer)){ return $collection; }
         $original_collection = $collection;
 
-        if(get_class($object->$pointer) == 'Illuminate\Database\Eloquent\Collection'){
+        if(!is_string($object->$pointer)){
             $collection = [];
 
-            foreach($object->$pointer as $obj){
-                $fetch = $this->relationIterator($obj,$relation_rules,$original_collection);
+            if(is_object($object->$pointer)){
+                echo($pointer);
+                $fetch = $this->relationIterator($object->$pointer,$relation_rules,$original_collection,$output);
                 if($fetch){ $collection[] = $fetch; }
+            } else {
+                echo(gettype($object->$pointer));
+                $output[] = $object->$pointer;
             }
 
-            return $collection;
+/*            echo(gettype($object->$pointer));
+
+            foreach($object->$pointer as $obj){
+                echo(gettype($object->$pointer));
+
+                if(isset($obj->$pointer)){
+                    echo(get_class($obj->$pointer));
+                    echo(gettype($object->$pointer));
+                }
+
+                $fetch = $this->relationIterator($obj,$relation_rules,$original_collection);
+                if($fetch){ $collection[] = $fetch; }
+            }*/
+
+/*            return $collection;
+        } elseif(!$collection) {
+            $return[] = $object->$pointer;
+            return $return;
         } else {
             return $object->$pointer;
-        }
-
+        }*/
     }
 
 

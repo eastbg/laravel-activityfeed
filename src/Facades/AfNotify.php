@@ -11,12 +11,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * Class AfRules
  *
- * @method static AfNotifyHelper add(string $slug)
- * @method static AfNotifyHelper setDbField(string $field)
- * @method static AfNotifyHelper setDbKey(int $key)
- * @method static AfNotifyHelper setDbTable(string $table)
- * @method static AfNotifyHelper setDigestible(bool $digest)
- * @method static AfNotifyHelper setUser(int $id_user)
+ * @method static AfNotifyHelper addNotification()
  *
  * @package App\Facades
  */

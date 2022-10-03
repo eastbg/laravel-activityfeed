@@ -165,7 +165,7 @@ class LaravelActivityfeedServiceProvider extends ServiceProvider
         });
 
         $this->app->bind('af-notify', function () {
-            return new AfNotifyHelper();
+            return new AfDataHelper();
         });
 
         $this->app->singleton(AfCachingHelper::class, function () {

@@ -26,14 +26,13 @@ trait AfTraitCustomRule
 
     /** Launched by cron:AfPollAction - creates events
      * @param AfRule $rule
-     * @return bool
+     * @return false|void
      */
 
-    public function createCustomRuleEvent(AfRule $rule) : bool
+    public function createCustomRule(AfRule $rule)
     {
 
         $obj = $this->createCustomRuleObj($rule);
-
         if (!$obj) {
             return false;
         }
@@ -49,7 +48,7 @@ trait AfTraitCustomRule
         }
 
         // if no event, create it
-        return $this->createEvent($rule);
+        $this->createEvent($rule);
     }
 
 
@@ -71,24 +70,21 @@ trait AfTraitCustomRule
     }
 
 
-    private function createEvent(AfRule $rule,$db_table=null,$db_field=null,$db_key=null)
+    private function createEvent(AfRule $rule)
     {
         $event = new AfEvent();
         $event->id_rule = $rule->id;
-        $event->dbtable = $db_table;
-        $event->dbkey = $db_key;
+        $event->dbtable = null;
+        $event->dbkey = $this->id;
         $event->operation = 'Custom';
-        $event->dbfield = $db_field;
+        $event->dbfield = null;
         $event->digestible = $rule->digestible;
 
         try {
             $event->save();
         } catch (\Throwable $e) {
             Log::log('error', $e->getMessage());
-            return false;
         }
-
-        return $event;
     }
 
     /**
@@ -116,7 +112,6 @@ trait AfTraitCustomRule
             Log::error('AF-NOTIFY: No custom script method found for rule ' . $rule_name);
             return false;
         }
-
         return $obj;
     }
 

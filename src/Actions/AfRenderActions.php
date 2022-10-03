@@ -65,24 +65,24 @@ class AfRenderActions extends Model
         return $vars;
     }
 
-    public function getRenderedNotification(AfEvent $record){
+    public function getRenderedNotification(AfNotification $record){
 
-        $class = AfHelper::getTableClass($record->dbtable);
-        $template_obj = $record->afRule->afTemplate;
+        $class = AfHelper::getTableClass($record->afEvent->dbtable);
+        $template_obj = $record->afEvent->afRule->afTemplate;
         $new_vars = [];
 
         if(class_exists($class)){
-            $obj = $class::find($record->dbkey);
+            $obj = $class::find($record->afEvent->dbkey);
 
             if($obj){
-                $vars[$record->dbtable] = $obj;
+                $vars[$record->afEvent->dbtable] = $obj;
 
                 // make sure the variable array is "reset" for each record
                 $new_vars = AfRender::varReplacer($obj,$template_obj->notification_template,$vars);
             }
         }
 
-        return AfRender::renderTemplate($record->afRule->afTemplate,$new_vars,'');
+        return AfRender::renderTemplate($record->afEvent->afRule->afTemplate,$new_vars,'');
     }
 
 
@@ -222,7 +222,6 @@ class AfRenderActions extends Model
     public function renderTemplate(AfTemplate $template, $vars = [], $type = 'email-')
     {
         $output = '';
-
 
         try {
             $output = view('vendor.activity-feed.' . $template->id . '.' . $type . 'notification', $vars)->render();

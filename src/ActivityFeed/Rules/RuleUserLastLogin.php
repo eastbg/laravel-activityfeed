@@ -2,27 +2,22 @@
 
 namespace East\LaravelActivityfeed\ActivityFeed\Rules;
 
-use East\LaravelActivityfeed\Interfaces\RuleInterface;
-use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
-use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
-use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 
 class RuleUserLastLogin extends RuleBase {
 
     public static $description = '';
 
-    public function shouldRun(AfRule $rule) : bool{
-        return true;
-    }
+    public function run(AfNotification $notification){
 
-    public function createEvent(AfRule $rule) : AfEvent {
-        return new AfEvent();
-    }
+        // see if event exists for this
 
-    public function canRunUser(AfEvent $event,AfUsers $user) : bool{
-        return true;
-    }
+        // if no event, create it
 
+        // see if there are any unhandled events
+
+
+
+    }
 
 }

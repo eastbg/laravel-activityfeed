@@ -17,13 +17,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $dbtable
  * @property string $operation
  * @property string $dbfield
- * @property string $html
  * @property boolean $processed
  * @property boolean $digested
  * @property boolean $digestible
  * @property string $digest_content
  * @property AfRule $afRule
- * @property AfTemplate $afTemplate
  * @property User $creator
  */
 class AfEvent extends ActiveModelBase
@@ -60,8 +58,7 @@ class AfEvent extends ActiveModelBase
         'digested',
         'digestible',
         'digest_content',
-        'dbfield',
-        'html'
+        'dbfield'
     ];
 
     /**
@@ -81,19 +78,11 @@ class AfEvent extends ActiveModelBase
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function notifications()
-    {
-        return $this->hasMany(AfNotification::class, 'id_event');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function afTemplate()
     {
-        return $this->hasOneThrough(AfTemplate::class, AfRule::class,'id_template','id');
+        return $this->belongsTo(AfTemplate::class, 'id_user_creator');
     }
 
     /**

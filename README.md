@@ -87,9 +87,8 @@ Recipients (pivot)
         ↓
       Users
 ```
-As pivot records don't exist when creating the Posts, we will save this event to be created as a notification by the cron job. The relationship chain is mapped in config file called af-database-targeting.php
+As pivot records don't exist when creating the Posts, we will save this event to be created as a notification by the cron job. The difficult part is on mapping the relationship chain.
 
-The relationship chain
 
 
 ### Templating

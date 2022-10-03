@@ -212,10 +212,8 @@ class AfDataHelper extends Model
 
         foreach($routings as $tbl => $route){
             if($tbl == $table){
-                foreach($route as $rule){
-                    if(isset($rule['id']) AND $rule['id'] == $rule_id){
-                        return $rule;
-                    }
+                if(isset($route[0])){
+                    return $route[0];
                 }
             }
         }
