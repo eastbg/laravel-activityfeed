@@ -2,6 +2,7 @@
 
 namespace East\LaravelActivityfeed\Http\Backpack;
 
+use App\Models\Zoho\Modules\Models\Candidates;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
@@ -78,7 +79,6 @@ class AfRulesCrudController extends CrudController
     protected function setupCreateOperation()
     {
 
-
         // todo: custom view & component which warns about possible missing
         // variables when template + table have been selected
         //$this->crud->setCreateView('af_feed::backpack.af-views.template-create-form');
@@ -129,7 +129,10 @@ class AfRulesCrudController extends CrudController
                         ]
                     ],
                 ],
-                'hint' => 'Select what triggers',
+                'hint' => 'Select triggering type. If rule is triggered directly from the code. If the
+                                                      rule type is "Manual from code" the source table
+                                                      is defined in the code. You should have both template
+                                                      and a rule using same slug to link to table.',
                 'wrapper' => [
                     'class' => 'form-group col-md-12',
                     'id' => 'targeting2'
@@ -279,7 +282,8 @@ class AfRulesCrudController extends CrudController
     private function tabInfo()
     {
 
-        $this->crud->field('name')->tab('Info');
+        $this->crud->field('name')->tab('Info')->tab('Info');
+        $this->crud->field('slug')->tab('Slug')->tab('Info')->hint('This is used to identify the rule, needs to be unique.');
         $this->crud->field('enabled')->type('checkbox')->label('Enabled')->tab('Info');
         $this->crud->field('description')->type('textarea')->tab('Info');
         $this->crud->field('digestible')->type('checkbox')->label('Digestible')->hint('Email will be included in the digest as opposed to sending right away.')->tab('Info');

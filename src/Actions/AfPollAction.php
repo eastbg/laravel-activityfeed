@@ -36,41 +36,38 @@ class AfPollAction extends Model
 
         // run normal events
         $records = AfEvent::where('processed', '=', '0')
-            ->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')
+            ->with('afRule', 'afRule.afTemplate', 'afRule.afTemplate.afParent')
             ->get();
 
-        foreach($records as $record) {
+        foreach ($records as $record) {
             // means it's digestable, but not yet digested, so we skip it
             if ($record->digestible and !$record->digested) {
                 continue;
             }
 
-            //try {
-            $this->handleEvent($record);
-            $this->addToAdmins($record);
+            try {
+                $this->handleEvent($record);
+                $this->addToAdmins($record);
+            } catch (\Throwable $exception) {
+                Log::error('AF-NOTIFY: failed to handle event ' . $exception->getMessage());
+            }
 
+            $record->processed = 1;
+            $record->save();
         }
 
-/*            } catch (\Throwable $exception){
-
-            }*/
-
-            //$record->processed = 1;
-            //$record->save();
-        //}
-
-        //$this->runCustomRules();
-            //$this->sendMessages();
+        $this->runCustomRules();
+        $this->sendMessages();
     }
 
     /**
      * @return bool
      */
-    private function runDigestibles() : bool
+    private function runDigestibles(): bool
     {
 
         $records = AfEvent::where('digestible', '=', '1')->where(
-            'digested', '=', '0')->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')->get();
+            'digested', '=', '0')->with('afRule', 'afRule.afTemplate', 'afRule.afTemplate.afParent')->get();
 
         foreach ($records as $record) {
             $timing = Carbon::now()->addSeconds($record->afRule->digest_delay)->toDateTimeString();
@@ -83,50 +80,40 @@ class AfPollAction extends Model
         return false;
     }
 
-    //$this->addToAdmins($record);
-
-    /*            $this->applyRules($record);
-                $record->processed = 1;
-                $record->save();*/
-
-
+    // this will use the custom channel classes to send notifications
     private function sendMessages()
     {
         $records = AfNotification::with('afEvent', 'afEvent.afRule', 'afEvent.afRule.afTemplate')->where('sent', '=', 0)->get();
 
-        print_r(count($records));
-
-        foreach($records as $record){
+        foreach ($records as $record) {
             $channels = json_decode($record->afEvent->afRule->channels);
 
-            print_r($channels);
+            if ($channels) {
+                foreach ($channels as $channel) {
+                    $class = 'App\ActivityFeed\Channels\Channel' . $channel;
 
-            if($channels){
-                foreach ($channels as $channel){
-                    $class = 'App\ActivityFeed\Channels\Channel'.$channel;
-
-                    if(!class_exists($class)){
-                        $class = 'East\LaravelActivityfeed\ActivityFeed\Channels'.$channel;
+                    if (!class_exists($class)) {
+                        $class = 'East\LaravelActivityfeed\ActivityFeed\Channels' . $channel;
                     }
 
-                    if(!class_exists($class)){
-                        Log::error('AF-NOTIFY: Notification class does not exist '.$channel);
-                        echo('no channel found');
+                    if (!class_exists($class)) {
+                        Log::error('AF-NOTIFY: Notification class does not exist ' . $channel);
                         continue;
                     }
 
                     try {
                         $obj = new $class;
                         $obj->send($record);
-                    } catch (\Throwable $exception){
-                        print_r($exception->getMessage());
+                        Log::info('AF-NOTIFY: Message sent. Channel ' . $channel . ' to user ' . $record->id_user_recipient);
+
+                    } catch (\Throwable $exception) {
                         Log::error('AF-NOTIFY: Error sending message ' . $exception->getMessage());
                     }
                 }
             }
 
-/*            $record->sent = 1;
-            $record->save();*/
+            /*            $record->sent = 1;
+                        $record->save();*/
         }
 
 
@@ -172,7 +159,6 @@ class AfPollAction extends Model
     }
 
 
-
     private function addToAdmins($record)
     {
         $users = \App\ActivityFeed\AfUsersModel::where('admin', '=', 1)->get();
@@ -200,7 +186,7 @@ class AfPollAction extends Model
         try {
             $obj->save();
         } catch (\Throwable $exception) {
-            Log::error('AF-NOTIFY: '.$exception->getMessage());
+            Log::error('AF-NOTIFY: ' . $exception->getMessage());
         }
     }
 

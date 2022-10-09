@@ -6,6 +6,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
 use Backpack\Pro\Http\Controllers\Operations\CloneOperation;
 use East\LaravelActivityfeed\Models\ActiveModels\AfCategory;
+use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Requests\AfCategoriesRequest;
 use East\LaravelActivityfeed\Requests\AfRulesRequest;
@@ -78,10 +79,20 @@ class AfTemplatesCrudController extends CrudController
      */
     protected function setupCreateOperation()
     {
+
+        $id = request()->route('id');
+        $template = AfTemplate::where('id','=',$id)->first();
+        if($template){
+            $this->data['rule'] = AfRule::where('slug','=',$template->slug)->first();
+        }
+
+
         //CRUD::setValidation(AfTemplatesRequest::class);
         $this->crud->setCreateView('af_feed::backpack.af-views.template-create-form');
 
         CRUD::field('name');
+        CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
+
         CRUD::field('description')->type('textarea');
 
         //$this->crud->field('enabled')->type('checkbox')->label('Enabled');
@@ -137,7 +148,6 @@ class AfTemplatesCrudController extends CrudController
             ]
         );*/
 
-        CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
 
         CRUD::field('notification_template')->type('af_textarea')->label('Notification template')
             ->hint('Available variables: $user (AfUser) + $creator (AfUser) + $notification (AfNotification). 

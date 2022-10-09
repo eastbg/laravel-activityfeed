@@ -36,7 +36,6 @@ class AfNotifyHelper extends Model
         $obj->digestible = $this->digestible;
         $obj->dbtable = $this->dbtable;
         $obj->dbkey = $this->dbkey;
-        //$obj->me
         $obj->id_rule = $rule->id;
 
         try {

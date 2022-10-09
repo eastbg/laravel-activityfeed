@@ -1,5 +1,21 @@
 <div class="af-box">
+
+    @php
+        $pointer = 'af_strings.'.$rule->slug;
+        if(Lang::has($pointer)){
+            $pointer_exists = true;
+        }
+    @endphp
+
+    @if(isset($pointer_exists))
+        <div style="background: #E1E4EB; border-radius: 8px; padding: 8px;width: 100%;color:red;font-weight: bold;">
+            Note: {{Lang::get('af_strings.'.$rule->slug)}}
+            <p style="color:black; font-weight: normal;">This is based on having the same slug in templates and rules.</p>
+        </div>
+    @endif
+
     <br><b></b><label>Browse table info</label></b>
+
     <select name="relationship-browser" class="form-control" id="af-relationship-browser"
             onchange="afLoadTableInfo();">
         <option value="">Loading ..</option>

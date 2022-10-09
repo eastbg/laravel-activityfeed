@@ -38,6 +38,9 @@
     </ul>
 
     <div id="af-maintab-instructions">
+
+
+
         @include('backpack.af-views.template-instructions')
     </div>
 

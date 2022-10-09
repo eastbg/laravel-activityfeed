@@ -31,6 +31,10 @@ trait AfTraitNotificationAdd
      */
     private function handleEvent(AfEvent $event)
     {
+        if(!$event->dbtable OR !isset($event->afRule->id) OR !$event->afRule->id){
+            return true;
+        }
+
         $rule = AfHelper::getTargeting($event->dbtable,$event->afRule->id);
         $class = AfHelper::getTableClass($event->dbtable);
         $obj = $class::find($event->dbkey);
