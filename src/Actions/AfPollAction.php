@@ -39,25 +39,28 @@ class AfPollAction extends Model
             ->with('afRule', 'afRule.afTemplate','afRule.afTemplate.afParent')
             ->get();
 
-        foreach($records as $record){
+        foreach($records as $record) {
             // means it's digestable, but not yet digested, so we skip it
-            if($record->digestible AND !$record->digested){
+            if ($record->digestible and !$record->digested) {
                 continue;
             }
 
             //try {
-                $this->handleEvent($record);
-                $this->addToAdmins($record);
+            $this->handleEvent($record);
+            $this->addToAdmins($record);
+
+        }
+
 /*            } catch (\Throwable $exception){
 
             }*/
 
             //$record->processed = 1;
             //$record->save();
-        }
+        //}
 
         //$this->runCustomRules();
-        //$this->sendMessages();
+            //$this->sendMessages();
     }
 
     /**
@@ -89,8 +92,45 @@ class AfPollAction extends Model
 
     private function sendMessages()
     {
-        $records = AfNotification::with('afEvent', 'afEvent.afRule', 'afEvent.afRule.afTemplate')->where('processed', '=', 0)->get();
+        $records = AfNotification::with('afEvent', 'afEvent.afRule', 'afEvent.afRule.afTemplate')->where('sent', '=', 0)->get();
 
+        print_r(count($records));
+
+        foreach($records as $record){
+            $channels = json_decode($record->afEvent->afRule->channels);
+
+            print_r($channels);
+
+            if($channels){
+                foreach ($channels as $channel){
+                    $class = 'App\ActivityFeed\Channels\Channel'.$channel;
+
+                    if(!class_exists($class)){
+                        $class = 'East\LaravelActivityfeed\ActivityFeed\Channels'.$channel;
+                    }
+
+                    if(!class_exists($class)){
+                        Log::error('AF-NOTIFY: Notification class does not exist '.$channel);
+                        echo('no channel found');
+                        continue;
+                    }
+
+                    try {
+                        $obj = new $class;
+                        $obj->send($record);
+                    } catch (\Throwable $exception){
+                        print_r($exception->getMessage());
+                        Log::error('AF-NOTIFY: Error sending message ' . $exception->getMessage());
+                    }
+                }
+            }
+
+/*            $record->sent = 1;
+            $record->save();*/
+        }
+
+
+        /*
         foreach ($records as $record) {
             if ($record->afEvent->afRule->digestible and $record->afEvent->afRule->digest_delay) {
                 try {
@@ -109,7 +149,7 @@ class AfPollAction extends Model
                     Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
                 }
             }
-        }
+        }*/
     }
 
     private function runCustomRules()

@@ -49,9 +49,9 @@ class AfRulesCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('name');
+        CRUD::column('slug');
         CRUD::column('enabled')->type('check');;
-        CRUD::column('digestible')->type('check');;
+        CRUD::column('digestible')->type('check')->label('Digest');
         CRUD::column('rule_type');
         CRUD::column('table_name');
         CRUD::column('field_name');
