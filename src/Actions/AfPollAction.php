@@ -112,31 +112,9 @@ class AfPollAction extends Model
                 }
             }
 
-            /*            $record->sent = 1;
-                        $record->save();*/
+            $record->sent = 1;
+            $record->save();
         }
-
-
-        /*
-        foreach ($records as $record) {
-            if ($record->afEvent->afRule->digestible and $record->afEvent->afRule->digest_delay) {
-                try {
-                    $this->handledigestible($record);
-                    $record->processed = 1;
-                    $record->save();
-                } catch (\Throwable $exception) {
-                    Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
-                }
-            } else {
-                try {
-                    $this->handleNotification($record);
-                    $record->processed = 1;
-                    $record->save();
-                } catch (\Throwable $exception) {
-                    Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
-                }
-            }
-        }*/
     }
 
     private function runCustomRules()
@@ -144,17 +122,17 @@ class AfPollAction extends Model
         $records = AfRule::where('rule_script', '<>', '')->where('enabled', '=', 1)->get();
 
         foreach ($records as $record) {
-            //try {
-            $this->createCustomRule($record);
-            /*            } catch (\Throwable $exception){
-                            Log::error('AF-NOTIFY: Could not run custom script '.$exception->getMessage());
-                        }
+            try {
+                $this->createCustomRule($record);
+            } catch (\Throwable $exception) {
+                Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
+            }
 
-                        try {*/
-            $this->runCustomRuleEvents($record);
-            /*            } catch (\Throwable $exception){
-                            Log::error('AF-NOTIFY: Could not run custom script '.$exception->getMessage());
-                        }*/
+            try {
+                $this->runCustomRuleEvents($record);
+            } catch (\Throwable $exception) {
+                Log::error('AF-NOTIFY: Could not run custom script ' . $exception->getMessage());
+            }
         }
     }
 
