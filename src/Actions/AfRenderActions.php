@@ -331,6 +331,11 @@ class AfRenderActions extends Model
 
             $vars = [];
             $obj = null;
+            $url_template = $item->AfRule->AfTemplate->url_template ?? '';
+
+            if(!isset($item->AfRule->AfTemplate) OR !$item->AfRule->AfTemplate){
+                continue;
+            }
 
             if($item->afEvent->dbtable AND $item->afEvent->dbkey){
                 $class = AfHelper::getTableClass($item->afEvent->dbtable);
@@ -351,12 +356,15 @@ class AfRenderActions extends Model
                 ]))->render();
             } else {
                 $config = [
-                    'link' => str_replace('{id}',$item->afEvent->dbkey,$item->AfRule->AfTemplate->url_template),
                     'short_message' => $item->AfRule->AfTemplate->notification_template,
                     'time' => $item->created_at,
                     'read' => $item->read,
                     'id' => $item->id
                 ];
+
+                if($url_template AND isset($item->afEvent->dbkey) AND $item->afEvent->dbkey){
+                    $config['link'] = str_replace('{id}',$item->afEvent->dbkey,$url_template);
+                }
 
                 if($obj){
                     $replace_vars = AfRender::varReplacer($obj,$item->AfRule->AfTemplate->notification_template,$vars);
