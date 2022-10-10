@@ -328,20 +328,44 @@ class AfRenderActions extends Model
         $items = [];
 
         foreach ($feed as $item) {
+
+            $vars = [];
+            $obj = null;
+
+            if($item->afEvent->dbtable AND $item->afEvent->dbkey){
+                $class = AfHelper::getTableClass($item->afEvent->dbtable);
+                if($class){
+                    $obj = $class::find($item->afEvent->dbkey);
+                    if($obj){
+                        $vars[$item->afEvent->dbtable] = $obj;
+                    }
+                }
+            }
+
             if ($with_template) {
-                $items[] = view('vendor.activity-feed.' . $item->AfRule->AfTemplate->id . '.notification', [
+                $items[] = view('vendor.activity-feed.' . $item->AfRule->AfTemplate->id . '.notification',
+                    array_merge($vars,[
                     'recipient' => $item->recipient,
                     'creator' => $item->creator,
                     'notification' => $item
-                ])->render();
+                ]))->render();
             } else {
-                $items[] = [
+                $config = [
                     'link' => str_replace('{id}',$item->afEvent->dbkey,$item->AfRule->AfTemplate->url_template),
                     'short_message' => $item->AfRule->AfTemplate->notification_template,
                     'time' => $item->created_at,
                     'read' => $item->read,
                     'id' => $item->id
                 ];
+
+                if($obj){
+                    $replace_vars = AfRender::varReplacer($obj,$item->AfRule->AfTemplate->notification_template,$vars);
+                    foreach ($replace_vars as $key=>$v){
+                        $config['short_message'] = str_replace($key,$v,$config['short_message']);
+                    }
+                }
+
+                $items[] = $config;
             }
         }
 

@@ -78,6 +78,7 @@ class AfNotifyHelper extends Model
         return $this;
     }
 
+
     /**
      * @param mixed $dbtable
      * @return AfNotifyHelper

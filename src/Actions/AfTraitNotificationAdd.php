@@ -44,6 +44,10 @@ trait AfTraitNotificationAdd
 
         foreach($list as $user){
 
+            if(!isset($user->id)){
+                continue;
+            }
+
             // not to add a duplicate to admins
             if(isset($user->admin) AND $user->admin == 1 AND $event->afRule->to_admins){
                 continue;
@@ -73,6 +77,10 @@ trait AfTraitNotificationAdd
                     $output[] = $list_item->$rule;
                 }
 
+                continue;
+            }
+
+            if(!isset($object->$rule)){
                 continue;
             }
 
