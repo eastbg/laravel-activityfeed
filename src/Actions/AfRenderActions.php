@@ -364,6 +364,8 @@ class AfRenderActions extends Model
 
                 if($url_template AND isset($item->afEvent->dbkey) AND $item->afEvent->dbkey){
                     $config['link'] = str_replace('{id}',$item->afEvent->dbkey,$url_template);
+                } else {
+                    $config['link'] = '';
                 }
 
                 if($obj){
