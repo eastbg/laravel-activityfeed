@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Cache;
 
 class AfRenderActions extends Model
 {
@@ -317,8 +318,17 @@ class AfRenderActions extends Model
         if (!$this->id_user) {
             $this->id_user = auth()->user()->id;
         }
+
         if (!$this->id_user) {
             return '';
+        }
+
+        if($items = Cache::get('notifications-'.$this->id_user)){
+            if ($with_template) {
+                return view('af_feed::af-components.feed', ['feed' => $items]);
+            }
+
+            return $items;
         }
 
         $feed = AfNotification::where('id_user_recipient', '=', $this->id_user)->with([
@@ -379,6 +389,7 @@ class AfRenderActions extends Model
             }
         }
 
+        Cache::set('notifications-'.$this->id_user,$items);
 
         if ($with_template) {
             return view('af_feed::af-components.feed', ['feed' => $items]);

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class AfPollAction extends Model
@@ -154,6 +155,8 @@ class AfPollAction extends Model
         if ($id == $record->id_user_creator) {
             return false;
         }
+
+        Cache::delete('notifications-'.$id);
 
         $obj = new AfNotification();
         $obj->id_user_recipient = $id;
