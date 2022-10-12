@@ -135,7 +135,7 @@ class AfTemplatesCrudController extends CrudController
         );
 
 
-/*        $this->crud->addField(
+        $this->crud->addField(
             [
                 'name' => 'url_template',
                 'label' => 'URL format',
@@ -146,7 +146,7 @@ class AfTemplatesCrudController extends CrudController
                     'id' => 'w_url_format'
                 ],
             ]
-        );*/
+        );
 
 
         CRUD::field('notification_template')->type('af_textarea')->label('Notification template')
