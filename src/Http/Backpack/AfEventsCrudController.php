@@ -40,6 +40,14 @@ class AfEventsCrudController extends CrudController
         CRUD::setModel(AfEvent::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/af-events');
         CRUD::setEntityNameStrings('Event', 'Events');
+
+        $this->crud->denyAccess(['create','edit']);
+        $this->crud->removeButton('update');
+        $this->crud->removeButton('create');
+        $this->crud->removeButton('add');
+        $this->crud->removeButton('edit');
+
+
     }
 
     /**
@@ -50,12 +58,38 @@ class AfEventsCrudController extends CrudController
      */
     protected function setupListOperation()
     {
-        CRUD::column('name');
-        CRUD::column('enabled');
-        CRUD::column('rule_type');
-        CRUD::column('rule');
-        CRUD::column('table_name');
-        CRUD::column('field_name');
+        $this->crud->removeButton('update');
+        $this->crud->removeButton('delete');
+
+        CRUD::column('created_at');
+
+        $this->crud->addColumn(
+            [
+                // any type of relationship
+                'label' => 'Creator',
+                'type' => 'relationship',
+                'name' => 'creator', // name of relationship method in the model
+                'attribute' => 'email', // foreign key attribute that is shown to user
+            ]
+            );
+
+        $this->crud->addColumn(
+            [
+                // any type of relationship
+                'label' => 'Rule',
+                'type' => 'relationship',
+                'name' => 'afRule', // name of relationship method in the model
+                'attribute' => 'name', // foreign key attribute that is shown to user
+            ]
+            );
+
+
+/*        CRUD::column('digestible');
+        CRUD::column('digested');*/
+        CRUD::column('processed');
+        CRUD::column('dbtable');
+        CRUD::column('operation');
+        CRUD::column('dbkey');
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
