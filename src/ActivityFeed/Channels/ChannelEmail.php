@@ -11,7 +11,8 @@ use Illuminate\Mail\Message;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class ChannelEmail extends ChannelBase implements ChannelInterface {
+class ChannelEmail extends ChannelBase implements ChannelInterface
+{
 
     public $type = 'cron';
 
@@ -25,26 +26,30 @@ class ChannelEmail extends ChannelBase implements ChannelInterface {
         $email['from_name'] = $notification->creator->name ?? env('MAIL_FROM_NAME');
         $email['subject'] = $notification->AfEvent->AfRule->AfTemplate->email_subject ?? env('MAIL_FROM_NAME');
 
-        if(!$email['to_email'] OR !$email['from_email']){ return false; }
+        if (!$email['to_email'] or !$email['from_email']) {
+            return false;
+        }
+
+        if (!$message) {
+            Log::error('Message template missing! Rule: ' . $notification->afRule->slug);
+            return false;
+        }
 
         try {
             Mail::html($message, function ($message) use ($email) {
                 /* @var Message $message */
                 $message
-                    ->to($email['to_email'],$email['to_name'])
-                    ->from($email['from_email'],$email['from_name'])
+                    ->to($email['to_email'], $email['to_name'])
+                    ->from($email['from_email'], $email['from_name'])
                     ->subject($email['subject']);
             });
 
-            echo('SENT!');
-            print_r($email);
-
-        } catch (\Throwable $exception){
-            print_r($email);
-            Log::error($exception->getMessage() .json_encode($email));
-            print_r($exception->getMessage());
+        } catch (\Throwable $exception) {
+            Log::error($exception->getMessage() . json_encode($email));
+            return false;
         }
 
+        return true;
     }
 
 
