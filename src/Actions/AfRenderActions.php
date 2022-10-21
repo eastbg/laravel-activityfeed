@@ -72,6 +72,10 @@ class AfRenderActions extends Model
         $template_obj = $record->afEvent->afRule->afTemplate;
         $new_vars = [];
 
+        if(!$template_obj){
+            return false;
+        }
+
         if(class_exists($class)){
             $obj = $class::find($record->afEvent->dbkey);
 
