@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
+use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -27,6 +28,9 @@ class ActiveModelBase extends Model
                 $this->setAttribute($key,json_encode($attribute));
             }
         }
+
+        $cache = new AfCachingHelper;
+        $cache->flushCaches();
 
         parent::save($options);
     }

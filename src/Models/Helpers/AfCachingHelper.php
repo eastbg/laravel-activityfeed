@@ -21,6 +21,7 @@ class AfCachingHelper extends Model
     public static $user_caches = [
         'notifications-{{$id}}-unread',
         'notifications-{{$id}}-read',
+        'notifications-{{$id}}'
     ];
 
     public $random;
