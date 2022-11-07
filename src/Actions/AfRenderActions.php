@@ -3,6 +3,7 @@
 namespace East\LaravelActivityfeed\Actions;
 
 use App\Models\Email\Emailer;
+use App\Models\Zoho\Modules\Models\Candidates;
 use East\LaravelActivityfeed\Facades\AfHelper;
 use East\LaravelActivityfeed\Facades\AfRender;
 use East\LaravelActivityfeed\Facades\AfTemplating;
@@ -26,6 +27,8 @@ class AfRenderActions extends Model
     public $id_user;
     public $cache;
 
+    public $id_template;
+
     public function __construct(array $attributes = [])
     {
         AfTemplating::compileTemplates();
@@ -46,48 +49,104 @@ class AfRenderActions extends Model
      * @param $vars array
      * @return string
      */
-    public function varReplacer($baseobj, $data, $vars = []) : array
+    public function varReplacer($baseobj, $data, $vars = []): array
     {
-        $parts = $this->extractReplacementParts($data);
+        $keys = $this->extractReplacementParts($data);
 
-        foreach ($parts as $k => $part) {
-            $parts = explode('->', $part);
-            if(isset($parts[0])){
-                $subpart = $parts[0];
-                if(isset($vars[$subpart])) {
-                    $vars = $this->getObjectColumn($part,$vars,$vars[$subpart]);
-                    continue;
+        foreach ($keys as $k => $key) {
+
+            $parts = explode('->', $key);
+
+            if (isset($parts[0])) {
+                // base table
+                array_shift($parts);
+                $value = $baseobj;
+
+                // loop to the actual value
+                foreach ($parts as $column) {
+                    //echo(chr(10).$column.chr(10));
+                    try {
+                        $value = $value->$column;
+                    } catch (\Throwable $exception){
+                        AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template. 
+Please note, that the base class here is ' . $baseobj::class . ' . ' . $exception->getMessage(),false);
+
+                    }
+                }
+
+
+                if(is_string($value) OR is_float($value) OR is_int($value)){
+                    $vars['{{$'.$key.'}}'] = $value;
                 }
             }
-
-            $vars = $this->getObjectColumn($part,$vars,$baseobj);
         }
 
         return $vars;
     }
 
-    public function getRenderedNotification(AfNotification $record){
+    public function getTemplateRelations($template, $class)
+    {
+        $parts = $this->extractReplacementParts($template);
+        $output = [];
+
+        foreach ($parts as $part) {
+            $vars = explode('->', $part);
+
+            // like this, as the source table is always mentioned in the relation
+            if (isset($vars[2])) {
+
+                // base table
+                array_shift($vars);
+
+                foreach ($vars as $table) {
+                    $line[] = $table;
+                }
+
+                // actual field
+                array_pop($line);
+                $output[] = implode('.', $line);
+                unset($line);
+            }
+        }
+
+        return array_unique($output);
+    }
+
+
+    public function getRenderedNotification(AfNotification $record)
+    {
 
         $class = AfHelper::getTableClass($record->afEvent->dbtable);
         $template_obj = $record->afEvent->afRule->afTemplate;
         $new_vars = [];
 
-        if(!$template_obj){
+        if (!$template_obj) {
             return false;
         }
 
-        if(class_exists($class)){
-            $obj = $class::find($record->afEvent->dbkey);
+        if (class_exists($class)) {
+            $with = $this->getTemplateRelations($record->afEvent->afRule->afTemplate, $class);
 
-            if($obj){
+            try {
+                $obj = $class::where('id', '=', $record->afEvent->dbkey)
+                    ->with($with)
+                    ->first();
+            } catch (\Throwable $exception) {
+                AfHelper::addTemplateError($record->afEvent->afRule->id_template, 'You have incorrectly defined relations in this template. 
+Please note, that the base class here is ' . $class . ' . ' . $exception->getMessage());
+                $obj = $class::find($record->afEvent->dbkey);
+            }
+
+
+            if ($obj) {
                 $vars[$record->afEvent->dbtable] = $obj;
 
                 // make sure the variable array is "reset" for each record
-                $new_vars = AfRender::varReplacer($obj,$template_obj->notification_template,$vars);
+                $new_vars = AfRender::varReplacer($obj, $template_obj->notification_template, $vars);
             }
         }
 
-        return AfRender::renderTemplate($record->afEvent->afRule->afTemplate,$new_vars,'');
+        return AfRender::renderTemplate($record->afEvent->afRule->afTemplate, $new_vars, '');
     }
 
 
@@ -111,13 +170,13 @@ class AfRenderActions extends Model
      * @param $template
      * @return string - Returns json encoded string
      */
-    public function mockVarReplacer($data, $template_id = null, $template = '',$debug=true) : string
+    public function mockVarReplacer($data, $template_id = null, $template = '', $debug = true): string
     {
         $replace = [];
         $parts = $this->extractReplacementParts($data);
 
         foreach ($parts as $k => $part) {
-            $replace = $this->getObjectColumn($part, $replace,false,$debug);
+            $replace = $this->getObjectColumn($part, $replace, false, $debug);
         }
 
         if (!$replace) {
@@ -143,17 +202,17 @@ class AfRenderActions extends Model
         return json_encode($this->cleanUpCss($data));
     }
 
-    public function getObjectColumn($column_string, $replace,$obj=false,$debug=false)
+    public function getObjectColumn($column_string, $replace, $obj = false, $debug = false)
     {
         $path = explode('->', $column_string);
 
-        if(!$obj){
+        if (!$obj) {
             $obj = $this->getMockObject($path[0]);
         }
 
         $key = '{{$' . $column_string . '}}';
 
-        if ($obj AND isset($path[1])) {
+        if ($obj and isset($path[1])) {
             $pointer = $path[1];
             $final = false;
 
@@ -170,10 +229,10 @@ class AfRenderActions extends Model
                 foreach ($path as $item) {
                     if (stristr($item, ' ')) {
                         $item = explode(' ', $item);
-                        if(isset($final->{$item[0]})){
+                        if (isset($final->{$item[0]})) {
                             $final = $final->{$item[0]};
                         }
-                    } elseif(isset($final->{$item})) {
+                    } elseif (isset($final->{$item})) {
                         $final = $final->{$item};
                     }
                 }
@@ -182,15 +241,15 @@ class AfRenderActions extends Model
             if (is_string($final)) {
                 $replace[$key] = $final;
             } else {
-                if($debug){
-                    $replace[$key] = $this->returnFieldError($key.' NOT FOUND "' . $path[0].'"!');
+                if ($debug) {
+                    $replace[$key] = $this->returnFieldError($key . ' NOT FOUND "' . $path[0] . '"!');
                 } else {
                     $replace[$key] = '?';
                 }
             }
         } else {
-            if($debug){
-                $replace[$key] = $this->returnFieldError($key.' NOT FOUND "' . $path[0].'"!');
+            if ($debug) {
+                $replace[$key] = $this->returnFieldError($key . ' NOT FOUND "' . $path[0] . '"!');
             } else {
                 $replace[$key] = '?';
             }
@@ -199,8 +258,9 @@ class AfRenderActions extends Model
         return $replace;
     }
 
-    private function returnFieldError($msg){
-        return '<span class="text-danger">'.$msg.'</span>';
+    private function returnFieldError($msg)
+    {
+        return '<span class="text-danger">' . $msg . '</span>';
     }
 
     private function cleanUpCss($data)
@@ -317,7 +377,8 @@ class AfRenderActions extends Model
             ->count();
     }
 
-    public function getFeed($with_template = false)
+
+    public function getFeed($unread_only = true, $with_template = false, $from = 0, $to = 100)
     {
         if (!$this->id_user) {
             $this->id_user = auth()->user()->id;
@@ -327,17 +388,38 @@ class AfRenderActions extends Model
             return '';
         }
 
-        if($items = Cache::get('notifications-'.$this->id_user)){
-            if ($with_template) {
-                return view('af_feed::af-components.feed', ['feed' => $items]);
-            }
 
-            return $items;
+        $cache_name = $unread_only ? 'notifications-' . $this->id_user . '-unread' : 'notifications-' . $this->id_user . '-read';
+
+        if ($items = Cache::get($cache_name)) {
+            if ($with_template) {
+                //return view('af_feed::af-components.feed', ['feed' => $items]);
+            }
+            //return $items;
         }
 
-        $feed = AfNotification::where('id_user_recipient', '=', $this->id_user)->with([
-            'afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate','afEvent'
-        ])->where('read','=',0)->orderBy('id','DESC')->get();
+        if ($unread_only) {
+            $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
+                ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
+                ->where('read', '=', 0)
+                ->orderBy('id', 'DESC')
+                ->get();
+        } else {
+            $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
+                ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
+                ->orderBy('id', 'DESC')
+                ->offset($from)
+                ->limit($from + $to)
+                ->get();
+        }
+
+        $items = $this->getFeedRender($query, true);
+        //Cache::set($cache_name,$items);
+        return $items;
+    }
+
+    private function getFeedRender($feed, $with_template = false)
+    {
 
         $items = [];
 
@@ -346,58 +428,77 @@ class AfRenderActions extends Model
             $vars = [];
             $obj = null;
             $url_template = $item->AfRule->AfTemplate->url_template ?? '';
+            $this->id_template = $item->AfRule->AfTemplate->id;
 
-            if(!isset($item->AfRule->AfTemplate) OR !$item->AfRule->AfTemplate){
+            if (!isset($item->AfRule->AfTemplate) or !$item->AfRule->AfTemplate) {
                 continue;
             }
 
-            if($item->afEvent->dbtable AND $item->afEvent->dbkey){
+            if (!$item->AfRule->enabled) {
+                continue;
+            }
+
+            if ($item->afEvent->dbtable and $item->afEvent->dbkey) {
                 $class = AfHelper::getTableClass($item->afEvent->dbtable);
-                if($class){
-                    $obj = $class::find($item->afEvent->dbkey);
-                    if($obj){
+                if ($class) {
+                    $with = $this->getTemplateRelations($item->AfRule->AfTemplate, $class);
+
+                    try {
+                        $obj = $class::where('id', '=', $item->afEvent->dbkey)
+                            ->with($with)
+                            ->first();
+
+                    } catch (\Throwable $exception) {
+                        AfHelper::addTemplateError($item->AfRule->AfTemplate->id, 'You have incorrectly defined relations in this template. 
+Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
+
+                        $obj = $class::find($item->afEvent->dbkey);
+                    }
+
+
+                    // is not needed anymore, as var replacer takes care of it all
+/*                    if ($obj) {
                         $vars[$item->afEvent->dbtable] = $obj;
-                    }
+                    }*/
                 }
             }
 
-            if ($with_template) {
-                $items[] = view('vendor.activity-feed.' . $item->AfRule->AfTemplate->id . '.notification',
-                    array_merge($vars,[
-                    'recipient' => $item->recipient,
-                    'creator' => $item->creator,
-                    'notification' => $item
-                ]))->render();
+            $config = [
+                'short_message' => $item->AfRule->AfTemplate->notification_template,
+                'time' => $item->created_at,
+                'read' => $item->read,
+                'id' => $item->id
+            ];
+
+            if ($url_template and isset($item->afEvent->dbkey) and $item->afEvent->dbkey) {
+                $config['link'] = str_replace('{id}', $item->afEvent->dbkey, $url_template);
             } else {
-                $config = [
-                    'short_message' => $item->AfRule->AfTemplate->notification_template,
-                    'time' => $item->created_at,
-                    'read' => $item->read,
-                    'id' => $item->id
-                ];
-
-                if($url_template AND isset($item->afEvent->dbkey) AND $item->afEvent->dbkey){
-                    $config['link'] = str_replace('{id}',$item->afEvent->dbkey,$url_template);
-                } else {
-                    $config['link'] = '';
-                }
-
-                if($obj){
-                    $replace_vars = AfRender::varReplacer($obj,$item->AfRule->AfTemplate->notification_template,$vars);
-                    foreach ($replace_vars as $key=>$v){
-                        $config['short_message'] = str_replace($key,$v,$config['short_message']);
-                    }
-                }
-
-                $items[] = $config;
+                $config['link'] = '';
             }
+
+            if ($obj) {
+                $replace_vars = AfRender::varReplacer($obj, $item->AfRule->AfTemplate->notification_template, $vars);
+                foreach ($replace_vars as $key => $v) {
+                    $config['short_message'] = str_replace($key, $v, $config['short_message']);
+                }
+            } elseif ($item->AfRule->AfTemplate->notification_template) {
+                $config['short_message'] = $item->AfRule->AfTemplate->notification_template;
+            } else {
+                $config['short_message'] = 'Notification template missing!';
+            }
+
+            $items[] = $config;
+
         }
 
-        Cache::set('notifications-'.$this->id_user,$items);
+        /*        if($items){
+                    print_r($items);die();
+                }*/
 
-        if ($with_template) {
-            return view('af_feed::af-components.feed', ['feed' => $items]);
-        }
+
+        /*        if ($with_template) {
+                    return view('af_feed::af-components.feed', ['feed' => $items]);
+                }*/
 
         return $items;
     }

@@ -20,7 +20,7 @@ class Cache extends Command
      *
      * @var string
      */
-    protected $description = 'Creates rules based on database structure';
+    protected $description = 'Flushes all notification caches';
 
     /**
      * Create a new command instance.

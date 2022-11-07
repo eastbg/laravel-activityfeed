@@ -2,6 +2,7 @@
 
 namespace East\LaravelActivityfeed\Models\Helpers;
 
+use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
@@ -13,7 +14,13 @@ class AfCachingHelper extends Model
     use HasFactory;
 
     public static $caches = [
+        'af_rules',
+        'af_template_files'
+    ];
 
+    public static $user_caches = [
+        'notifications-{{$id}}-unread',
+        'notifications-{{$id}}-read',
     ];
 
     public $random;
@@ -26,6 +33,14 @@ class AfCachingHelper extends Model
     public function flushCaches(){
         foreach(self::$caches as $cache){
             Cache::delete($cache);
+        }
+
+        $users = AfUsers::all()->pluck(['id'])->toArray();
+
+        foreach ($users as $user){
+            foreach (self::$user_caches as $uc){
+                Cache::delete(str_replace('{{$id}}',$user,$uc));
+            }
         }
     }
 

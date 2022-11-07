@@ -21,7 +21,7 @@ class AfPoll extends Command
      *
      * @var string
      */
-    protected $description = 'Configures ActivityFeed and publishes resources';
+    protected $description = 'This should be a schedule action. Prepares notifications & sends to channels.';
 
     /**
      * Create a new command instance.

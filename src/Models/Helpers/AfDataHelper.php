@@ -5,6 +5,7 @@ namespace East\LaravelActivityfeed\Models\Helpers;
 use App\ActivityFeed\AfUsersModel;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
+use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\ActiveModels\AfUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -245,6 +246,26 @@ class AfDataHelper extends Model
             '<' => '< (value smaller than)',
             '>' => '> (value bigger than)',
         ];
+    }
+
+    public function addTemplateError($id,$error,$disable_rules=true){
+        if(!$id){
+            return false;
+        }
+
+        $template = AfTemplate::find($id);
+        $string = $disable_rules ? 'Your template and all rules using this template have been disabled. ' : '';
+        $template->error = $string.$error;
+        $template->enabled = 0;
+        $template->save();
+
+        if($disable_rules){
+            $rules = AfRule::where('id_template','=',$id)->get();
+            foreach($rules as $rule){
+                $rule->enabled = 0;
+                $rule->save();
+            }
+        }
     }
 
     private function getFiles(string $directory, array $exclusions = [])

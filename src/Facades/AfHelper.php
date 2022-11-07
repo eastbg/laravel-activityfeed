@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * Class AfRules
  *
  * @method static AfDataHelper getTables()
+ * @method static AfDataHelper addTemplateError($id_template,$error)
  * @method static AfDataHelper getColumns($table)
  * @method static AfDataHelper getTableTargeting($table)
  * @method static AfDataHelper getTargeting($table,$id_rule)
