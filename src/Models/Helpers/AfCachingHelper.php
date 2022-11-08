@@ -15,7 +15,7 @@ class AfCachingHelper extends Model
 
     public static $caches = [
         'af_rules',
-        'af_template_files'
+        'af_template_files',
     ];
 
     public static $user_caches = [
@@ -39,9 +39,13 @@ class AfCachingHelper extends Model
         $users = AfUsers::all()->pluck(['id'])->toArray();
 
         foreach ($users as $user){
-            foreach (self::$user_caches as $uc){
-                Cache::delete(str_replace('{{$id}}',$user,$uc));
-            }
+            $this->flushUserCaches($user);
+        }
+    }
+
+    public function flushUserCaches($user){
+        foreach (self::$user_caches as $uc){
+            Cache::delete(str_replace('{{$id}}',$user,$uc));
         }
     }
 

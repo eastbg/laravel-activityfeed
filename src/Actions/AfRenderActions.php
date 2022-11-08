@@ -64,13 +64,11 @@ class AfRenderActions extends Model
 
                 // loop to the actual value
                 foreach ($parts as $column) {
-                    //echo(chr(10).$column.chr(10));
                     try {
                         $value = $value->$column;
                     } catch (\Throwable $exception) {
                         AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template. 
 Please note, that the base class here is ' . $baseobj::class . ' . ' . $exception->getMessage(), false);
-
                     }
                 }
 
@@ -391,9 +389,9 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
         if ($items = Cache::get($cache_name)) {
             if ($with_template) {
-                //return view('af_feed::af-components.feed', ['feed' => $items]);
+                return view('af_feed::af-components.feed', ['feed' => $items]);
             }
-            //return $items;
+            return $items;
         }
 
 
@@ -431,7 +429,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
 
         $items = $this->getFeedRender($query, true);
-        //Cache::set($cache_name,$items);
+        Cache::set($cache_name,$items);
         return $items;
     }
 
