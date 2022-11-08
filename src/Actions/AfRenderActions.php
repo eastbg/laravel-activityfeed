@@ -402,12 +402,14 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
                     ->where('read', '=', 0)
                     ->orderBy('af_notifications.id', 'DESC')
+                    ->groupBy('af_notifications.id')
                     ->get();
             } else {
                 $query = AfNotification::where('id_user_recipient', '=', $this->id_user)->orWhere('af_rules.to_admins', '=', 1)
                     ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
                     ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
                     ->orderBy('af_notifications.id', 'DESC')
+                    ->groupBy('af_notifications.id')
                     ->get();
             }
         } else {
@@ -416,12 +418,14 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
                     ->where('read', '=', 0)
                     ->orderBy('id', 'DESC')
+                    ->groupBy('af_notifications.id')
                     ->get();
             } else {
                 $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
                     ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
                     ->orderBy('id', 'DESC')
                     ->offset($from)
+                    ->groupBy('af_notifications.id')
                     ->limit($from + $to)
                     ->get();
             }
@@ -443,7 +447,11 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             $vars = [];
             $obj = null;
             $url_template = $item->AfRule->AfTemplate->url_template ?? '';
-            $this->id_template = $item->AfRule->AfTemplate->id;
+            $this->id_template = $item->AfRule->AfTemplate->id ?? false;
+
+            if(!$this->id_template){
+                continue;
+            }
 
             if (!isset($item->AfRule->AfTemplate) or !$item->AfRule->AfTemplate) {
                 continue;
