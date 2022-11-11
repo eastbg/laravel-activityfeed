@@ -59,6 +59,9 @@ trait AfTraitCustomRule
     public function runCustomRuleEvents(AfRule $rule)
     {
 
+        return true;
+
+        // todo: implement logic for custom rules
         $obj = $this->createCustomRuleObj($rule);
 
         // see if event exists for this

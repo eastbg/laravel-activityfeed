@@ -28,6 +28,7 @@ class AfNotifyHelper extends Model
         $rule = AfRule::where('slug','=',$rule_slug)->first();
 
         if(!$rule){
+            Log::log('error', 'AfHelper: Rule not found '.$rule_slug);
             return false;
         }
 
@@ -37,6 +38,8 @@ class AfNotifyHelper extends Model
         $obj->dbtable = $this->dbtable;
         $obj->dbkey = $this->dbkey;
         $obj->id_rule = $rule->id;
+        $obj->dbfield = $this->dbfield ?: $rule->field_name;
+        $obj->html = $this->extra_html;
 
         try {
             $obj->save();

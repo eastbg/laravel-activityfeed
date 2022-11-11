@@ -34,6 +34,7 @@ class AfTemplateHelper extends Model
     }
 
     public function compileTemplates(){
+
         if(Cache::get('af_template_files')){ return true; }
 
         $path = resource_path('views/vendor/activity-feed');
@@ -56,7 +57,7 @@ class AfTemplateHelper extends Model
             file_put_contents($template_path.'/digest-notification.blade.php',$template->digest_template);
         }
 
-        Cache::set('af_template_files',true);
+        Cache::put('af_template_files',true);
     }
 
 

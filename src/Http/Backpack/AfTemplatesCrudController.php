@@ -58,8 +58,8 @@ class AfTemplatesCrudController extends CrudController
     protected function setupListOperation()
     {
         CRUD::column('name');
-        //CRUD::column('enabled')->type('check');
-        CRUD::column('master_template')->type('check');
+        CRUD::column('enabled')->type('check');
+        CRUD::column('master_template')->type('check')->label('Master');
         CRUD::column('slug');
         CRUD::column('error');
 
@@ -91,14 +91,13 @@ class AfTemplatesCrudController extends CrudController
 
         CRUD::field('name');
         CRUD::field('slug')->label('Slug')->hint('This is used to identify the template, needs to be unique.');
+        $this->crud->field('enabled')->type('checkbox')->label('Enabled');
 
         CRUD::field('description')->type('textarea');
 
-        //$this->crud->field('enabled')->type('checkbox')->label('Enabled');
-
         $this->crud->addField(
             [
-                'name' => 'master_template',
+                'name' => 'en_template',
                 'label' => 'Master template',
                 'type' => 'af_checkbox',
                 'hint' => 'Other templates can include master template as a base',

@@ -11,11 +11,13 @@ use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfTemplate;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
+use East\LaravelActivityfeed\Models\Helpers\AfDataHelper;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class AfRenderActions extends Model
 {
@@ -32,6 +34,7 @@ class AfRenderActions extends Model
     public function __construct(array $attributes = [])
     {
         AfTemplating::compileTemplates();
+
         $this->cache = App::make(AfCachingHelper::class);
 
         if (!$this->cache->random) {
@@ -44,12 +47,13 @@ class AfRenderActions extends Model
     /**
      * Does replacement for all columns in the template, including those behind relationship.
      *
-     * @param $baseobj
-     * @param $data string
+     * @param $baseobj --
+     * @param $data string -- the content where we extract the parts
      * @param $vars array
+     * @param bool $without_tags -- set true to get templating compatible array
      * @return string
      */
-    public function varReplacer($baseobj, $data, $vars = []): array
+    public function varReplacer($baseobj, $data, $vars = [],$without_tags=false): array
     {
         $keys = $this->extractReplacementParts($data);
 
@@ -73,7 +77,11 @@ Please note, that the base class here is ' . $baseobj::class . ' . ' . $exceptio
                 }
 
                 if (is_string($value) or is_float($value) or is_int($value)) {
-                    $vars['{{$' . $key . '}}'] = $value;
+                    if($without_tags){
+                        $vars[$key] = $value;
+                    } else {
+                        $vars['{{$' . $key . '}}'] = $value;
+                    }
                 }
             }
         }
@@ -290,6 +298,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         } catch (\Throwable $exception) {
             $template->error = $exception->getMessage();
             $template->save();
+            $msg = 'AF-NOTIFY: ' . $template->slug .' '.$exception->getMessage();
+            AfHelper::addTemplateError($template->id,$msg);
             return false;
         }
 
@@ -331,6 +341,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         $master_template_id = $notification->afEvent->afRule->afTemplate->id_parent ?? null;
         $parent_obj = $notification->afEvent->afRule->afTemplate->afParent ?? null;
         $event_obj = $notification->afEvent ?? null;
+        $email = $notification->afEvent->afRule->afTemplate->email_template;
 
         $vars = [
             'user' => $notification->recipient,
@@ -338,10 +349,18 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             'notification' => $notification
         ];
 
-        $vars = $this->eventObjectReplacement($event_obj, $vars);
+        $baseobj = $this->getEventRecord($notification->afEvent);
+
+        if($baseobj){
+            // we reference the base object by using table's name
+            $vars[$notification->afEvent->dbtable] = $baseobj;
+        }
+
         $template = $this->renderTemplate($template_obj, $vars);
 
-        $template = $this->mockVarReplacer($template, $notification->afEvent->afRule->id, $notification->afEvent->afRule->afTemplate->template);
+        if($html = $notification->afEvent->html){
+            $template = $template.$html;
+        }
 
         if (!$template) {
             return '';
@@ -358,6 +377,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
         return $template;
     }
+
 
     public function getFeedUnreadCount()
     {
@@ -414,7 +434,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             }
         } else {
             if ($unread_only) {
-                $query = AfNotification::where()('id_user_recipient', '=', $this->id_user)
+                $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
                     ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
                     ->where('read', '=', 0)
                     ->orderBy('id', 'DESC')
@@ -445,7 +465,6 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         foreach ($feed as $item) {
 
             $vars = [];
-            $obj = null;
             $url_template = $item->AfRule->AfTemplate->url_template ?? '';
             $this->id_template = $item->AfRule->AfTemplate->id ?? false;
 
@@ -461,31 +480,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                 continue;
             }
 
-            if ($item->afEvent->dbtable and $item->afEvent->dbkey) {
-                $class = AfHelper::getTableClass($item->afEvent->dbtable);
-                if ($class) {
-                    $with = $this->getTemplateRelations($item->AfRule->AfTemplate, $class);
-
-                    try {
-                        $obj = $class::where('id', '=', $item->afEvent->dbkey)
-                            ->with($with)
-                            ->first();
-
-                    } catch (\Throwable $exception) {
-                        AfHelper::addTemplateError($item->AfRule->AfTemplate->id, 'You have incorrectly defined relations in this template. 
-Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
-
-                        $obj = $class::find($item->afEvent->dbkey);
-
-                    }
-
-
-                    // is not needed anymore, as var replacer takes care of it all
-                    /*                    if ($obj) {
-                                            $vars[$item->afEvent->dbtable] = $obj;
-                                        }*/
-                }
-            }
+            $obj = $this->getEventRecord($item->afEvent);
 
             if (isset(auth()->user()->admin) and auth()->user()->admin and $item->id_user_recipient != auth()->user()->id) {
                 $msg = $item->AfRule->AfTemplate->admin_template;
@@ -501,7 +496,8 @@ Please note, that the base class here is ' . $class . '. ' . $exception->getMess
             ];
 
             if ($url_template and isset($item->afEvent->dbkey) and $item->afEvent->dbkey) {
-                $config['link'] = str_replace('{id}', $item->afEvent->dbkey, $url_template);
+                $config['link'] = str_replace('{{$id}}', $item->afEvent->dbkey, $url_template);
+                $config['link'] = str_replace('{id}', $item->afEvent->dbkey, $config['link']);
             } else {
                 $config['link'] = '';
             }
@@ -531,6 +527,31 @@ Please note, that the base class here is ' . $class . '. ' . $exception->getMess
                 }*/
 
         return $items;
+    }
+
+    private function getEventRecord(AfEvent $event) {
+        $obj = null;
+
+        if ($event->dbtable and $event->dbkey) {
+            $class = AfHelper::getTableClass($event->dbtable);
+            if ($class) {
+                $with = $this->getTemplateRelations($event->AfRule->AfTemplate, $class);
+
+                try {
+                    $obj = $class::where('id', '=', $event->dbkey)
+                        ->with($with)
+                        ->first();
+
+                } catch (\Throwable $exception) {
+                    AfHelper::addTemplateError($event->AfRule->AfTemplate->id, 'You have incorrectly defined relations in this template. 
+Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
+
+                    $obj = $class::find($event->dbkey);
+                }
+            }
+        }
+
+        return $obj;
     }
 
     public function setUser($id)

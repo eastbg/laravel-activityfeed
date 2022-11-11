@@ -120,6 +120,10 @@ class AfPollAction extends Model
 
     private function runCustomRules()
     {
+
+        return true;
+
+        // todo: this needs to be implemented properly with safeguards
         $records = AfRule::where('rule_script', '<>', '')->where('enabled', '=', 1)->get();
 
         foreach ($records as $record) {

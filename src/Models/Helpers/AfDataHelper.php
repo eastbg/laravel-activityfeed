@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AfDataHelper extends Model
 {
@@ -253,11 +254,17 @@ class AfDataHelper extends Model
             return false;
         }
 
+        Log::error($error);
+
+        // local debugging
+        // return true;
+
         $template = AfTemplate::find($id);
         $string = $disable_rules ? 'Your template and all rules using this template have been disabled. ' : '';
         $template->error = $string.$error;
         $template->enabled = 0;
         $template->save();
+
 
         if($disable_rules){
             $rules = AfRule::where('id_template','=',$id)->get();

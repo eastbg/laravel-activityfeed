@@ -29,9 +29,6 @@ class ActiveModelBase extends Model
             }
         }
 
-        $cache = new AfCachingHelper;
-        $cache->flushCaches();
-
         parent::save($options);
     }
 
