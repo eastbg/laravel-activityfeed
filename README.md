@@ -15,7 +15,16 @@ This extension relies heavily on users table and requires you to have a column c
 ```bash
 php artisan vendor:publish --force
 ```
-will overwrite your changes to this model. So you can change this model to extend your existing user class.
+will overwrite your changes to thisAf model. So you can change this model to extend your existing user class.
+
+#### Screenshots
+
+![](screenshots/template-list.png)
+![](screenshots/templating.png)
+![](screenshots/template-database-explorer.png)
+![](screenshots/rules1.png)
+![](screenshots/rules2.png)
+![](screenshots/rules3.png)
 
 
 #### Run installer
