@@ -27,12 +27,12 @@ trait AfTraitSender
 
     public function handleNotification(AfNotification $notification)
     {
-        $channels = json_decode($notification->afEvent->AfRule->channels, true);
+        $channels = json_decode($notification->afEvent->afRule->channels, true);
 
         if(!$notification->afEvent->afRule->afTemplate->email_subject
         OR !$notification->afEvent->afRule->afTemplate->email_template
         ){
-            $notification->afEvent->afRule->afTemplate->error = 'There is a rule configured ('.$notification->afEvent->afRule->name .'), which uses this template & has a channel configured, 
+            $notification->afEvent->afRule->afTemplate->error = 'There is a rule configured ('.$notification->afEvent->afRule->name .'), which uses this template & has a channel configured,
             but is missing email subject or template content';
             $notification->afEvent->afRule->afTemplate->save();
             return false;

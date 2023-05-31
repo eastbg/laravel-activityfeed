@@ -24,7 +24,7 @@ class ChannelEmail extends ChannelBase implements ChannelInterface
 
         $email['from_email'] = $notification->creator->email ?? env('MAIL_FROM_ADDRESS');
         $email['from_name'] = $notification->creator->name ?? env('MAIL_FROM_NAME');
-        $email['subject'] = $notification->AfEvent->AfRule->AfTemplate->email_subject ?? env('MAIL_FROM_NAME');
+        $email['subject'] = $notification->AfEvent->afRule->afTemplate->email_subject ?? env('MAIL_FROM_NAME');
 
         if (!$email['to_email'] or !$email['from_email']) {
             return false;

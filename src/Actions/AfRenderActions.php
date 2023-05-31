@@ -71,7 +71,7 @@ class AfRenderActions extends Model
                     try {
                         $value = $value->$column;
                     } catch (\Throwable $exception) {
-                        AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template. 
+                        AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template.
 Please note, that the base class here is ' . $baseobj::class . ' . ' . $exception->getMessage(), false);
                     }
                 }
@@ -137,7 +137,7 @@ Please note, that the base class here is ' . $baseobj::class . ' . ' . $exceptio
                     ->with($with)
                     ->first();
             } catch (\Throwable $exception) {
-                AfHelper::addTemplateError($record->afEvent->afRule->id_template, 'You have incorrectly defined relations in this template. 
+                AfHelper::addTemplateError($record->afEvent->afRule->id_template, 'You have incorrectly defined relations in this template.
 Please note, that the base class here is ' . $class . ' . ' . $exception->getMessage());
                 $obj = $class::find($record->afEvent->dbkey);
             }
@@ -407,12 +407,12 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
         $cache_name = $unread_only ? 'notifications-' . $this->id_user . '-unread' : 'notifications-' . $this->id_user . '-read';
 
-        if ($items = Cache::get($cache_name)) {
+/*        if ($items = Cache::get($cache_name)) {
             if ($with_template) {
                 return view('af_feed::af-components.feed', ['feed' => $items]);
             }
             return $items;
-        }
+        }*/
 
 
         if (isset(auth()->user()->admin) and auth()->user()->admin) {
@@ -451,7 +451,6 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             }
         }
 
-
         $items = $this->getFeedRender($query, true);
         Cache::set($cache_name,$items);
         return $items;
@@ -465,27 +464,27 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         foreach ($feed as $item) {
 
             $vars = [];
-            $url_template = $item->AfRule->AfTemplate->url_template ?? '';
-            $this->id_template = $item->AfRule->AfTemplate->id ?? false;
+            $url_template = $item->afRule->afTemplate->url_template ?? '';
+            $this->id_template = $item->afRule->afTemplate->id ?? false;
 
             if(!$this->id_template){
                 continue;
             }
 
-            if (!isset($item->AfRule->AfTemplate) or !$item->AfRule->AfTemplate) {
+            if (!isset($item->afRule->afTemplate) or !$item->afRule->afTemplate) {
                 continue;
             }
 
-            if (!$item->AfRule->enabled) {
+            if (!$item->afRule->enabled) {
                 continue;
             }
 
             $obj = $this->getEventRecord($item->afEvent);
 
             if (isset(auth()->user()->admin) and auth()->user()->admin and $item->id_user_recipient != auth()->user()->id) {
-                $msg = $item->AfRule->AfTemplate->admin_template;
+                $msg = $item->afRule->afTemplate->admin_template;
             } else {
-                $msg = $item->AfRule->AfTemplate->notification_template;
+                $msg = $item->afRule->afTemplate->notification_template;
             }
 
             $config = [
@@ -535,7 +534,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         if ($event->dbtable and $event->dbkey) {
             $class = AfHelper::getTableClass($event->dbtable);
             if ($class) {
-                $with = $this->getTemplateRelations($event->AfRule->AfTemplate, $class);
+                $with = $this->getTemplateRelations($event->afRule->afTemplate, $class);
 
                 try {
                     $obj = $class::where('id', '=', $event->dbkey)
@@ -543,7 +542,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                         ->first();
 
                 } catch (\Throwable $exception) {
-                    AfHelper::addTemplateError($event->AfRule->AfTemplate->id, 'You have incorrectly defined relations in this template. 
+                    AfHelper::addTemplateError($event->afRule->afTemplate->id, 'You have incorrectly defined relations in this template.
 Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
 
                     $obj = $class::find($event->dbkey);
