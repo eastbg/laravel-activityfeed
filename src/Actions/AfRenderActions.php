@@ -407,12 +407,12 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
         $cache_name = $unread_only ? 'notifications-' . $this->id_user . '-unread' : 'notifications-' . $this->id_user . '-read';
 
-/*        if ($items = Cache::get($cache_name)) {
+        if ($items = Cache::get($cache_name)) {
             if ($with_template) {
                 return view('af_feed::af-components.feed', ['feed' => $items]);
             }
             return $items;
-        }*/
+        }
 
 
         if (isset(auth()->user()->admin) and auth()->user()->admin) {
