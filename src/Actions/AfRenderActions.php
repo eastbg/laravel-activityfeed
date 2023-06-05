@@ -423,6 +423,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->where('read', '=', 0)
                     ->orderBy('af_notifications.id', 'DESC')
                     ->groupBy('af_notifications.id')
+                    ->offset($from)
+                    ->limit($to)
                     ->get();
             } else {
                 $query = AfNotification::where('id_user_recipient', '=', $this->id_user)->orWhere('af_rules.to_admins', '=', 1)
@@ -430,6 +432,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
                     ->orderBy('af_notifications.id', 'DESC')
                     ->groupBy('af_notifications.id')
+                    ->offset($from)
+                    ->limit($to)
                     ->get();
             }
         } else {
@@ -439,6 +443,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->where('read', '=', 0)
                     ->orderBy('id', 'DESC')
                     ->groupBy('af_notifications.id')
+                    ->offset($from)
+                    ->limit($to)
                     ->get();
             } else {
                 $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
@@ -447,6 +453,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     ->offset($from)
                     ->groupBy('af_notifications.id')
                     ->limit($from + $to)
+                    ->offset($from)
+                    ->limit($to)
                     ->get();
             }
         }
