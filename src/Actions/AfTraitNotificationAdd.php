@@ -9,6 +9,7 @@ use East\LaravelActivityfeed\Models\ActiveModels\AfEvent;
 use East\LaravelActivityfeed\Models\ActiveModels\AfNotification;
 use East\LaravelActivityfeed\Models\ActiveModels\AfRule;
 use East\LaravelActivityfeed\Models\Helpers\AfCachingHelper;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
@@ -67,86 +68,20 @@ trait AfTraitNotificationAdd
     private function relationIterator($object,$relation_rules)
     {
 
-        $list = [];
+        $last = array_pop($relation_rules);
         $output = [];
 
-        foreach ($relation_rules as $rule){
+        foreach($relation_rules as $rule){
+            $object = $object->{$rule};
+        }
 
-            if($list){
-                foreach ($list as $list_item){
-                    $output[] = $list_item->$rule;
-                }
-
-                continue;
+        foreach($object as $item){
+            if(isset($item->{$last})){
+                $output[] = $item->{$last};
             }
-
-            if(!isset($object->$rule)){
-                continue;
-            }
-
-            if(is_object($object->$rule) AND get_class($object->$rule) == 'Illuminate\Database\Eloquent\Collection'){
-                foreach($object->$rule as $item){
-                    $list[] = $item;
-                }
-
-                continue;
-            }
-
-            $object = $object->$rule;
-
-/*
-            print_r(get_class($object->$rule));
-            $object = $object->$rule;*/
         }
 
         return $output;
-        //print_r($list);
-        print_r($output[0]->id_zoho);
-
-
-        die();
-
-
-
-/*
-        if(empty($relation_rules)){ return $collection; }
-        $pointer = array_shift($relation_rules);
-        if(!isset($object->$pointer)){ return $collection; }
-        $original_collection = $collection;
-
-        if(!is_string($object->$pointer)){
-            $collection = [];
-
-            if(is_object($object->$pointer)){
-                echo($pointer);
-                $fetch = $this->relationIterator($object->$pointer,$relation_rules,$original_collection,$output);
-                if($fetch){ $collection[] = $fetch; }
-            } else {
-                echo(gettype($object->$pointer));
-                $output[] = $object->$pointer;
-            }
-
-/*            echo(gettype($object->$pointer));
-
-            foreach($object->$pointer as $obj){
-                echo(gettype($object->$pointer));
-
-                if(isset($obj->$pointer)){
-                    echo(get_class($obj->$pointer));
-                    echo(gettype($object->$pointer));
-                }
-
-                $fetch = $this->relationIterator($obj,$relation_rules,$original_collection);
-                if($fetch){ $collection[] = $fetch; }
-            }*/
-
-/*            return $collection;
-        } elseif(!$collection) {
-            $return[] = $object->$pointer;
-            return $return;
-        } else {
-            return $object->$pointer;
-        }*/
     }
 
 

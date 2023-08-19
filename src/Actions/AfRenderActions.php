@@ -289,7 +289,13 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         return null;
     }
 
-    public function renderTemplate(AfTemplate $template, $vars = [], $type = 'email-')
+    /**
+     * @param AfTemplate $template
+     * @param $vars
+     * @param $type
+     * @return string
+     */
+    public function renderTemplate(AfTemplate $template, $vars = [], $type = 'email-') : string
     {
         $output = '';
 
@@ -300,12 +306,16 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             $template->save();
             $msg = 'AF-NOTIFY: ' . $template->slug .' '.$exception->getMessage();
             AfHelper::addTemplateError($template->id,$msg);
-            return false;
+            return '';
         }
 
         if ($output and $template->error) {
             $template->error = null;
             $template->save();
+        }
+
+        if(!stristr($output,'<html>')){
+            $output = '<!DOCTYPE html><html><head></head><body>'.$output.'</body></html>';
         }
 
         return $output;
