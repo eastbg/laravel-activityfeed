@@ -144,19 +144,19 @@ class AfPollAction extends Model
 
     private function addToAdmins($record)
     {
-        $users = \App\ActivityFeed\AfUsersModel::where('admin', '=', 1)->get();
+        $users = self::getAdmins();
 
         foreach ($users as $user) {
-            $this->addToUser($user->id, $record);
+            $this->addToUser($user, $record);
         }
     }
 
 
     private function addToUser(int $id, AfEvent $record)
     {
-
-        // not adding to user that created it
-        if ($id == $record->id_user_creator) {
+        $admins = self::getAdmins();
+        // not adding to user that created it unless it's admin
+        if ($id == $record->id_user_creator && !in_array($id,$admins)) {
             return false;
         }
 
@@ -175,5 +175,13 @@ class AfPollAction extends Model
         }
     }
 
-
+    private function getAdmins()
+    {
+        $users = \App\ActivityFeed\AfUsersModel::where('admin', '=', 1)->get();
+        $ids = [];
+        foreach($users as $user) {
+            $ids[] = $user->id;
+        }
+        return $ids;
+    }
 }

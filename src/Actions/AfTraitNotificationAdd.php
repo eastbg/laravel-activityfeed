@@ -36,6 +36,11 @@ trait AfTraitNotificationAdd
             return true;
         }
 
+        //messages to admins only
+        if($event->afRule->to_admins) {
+            return true;
+        }
+
         $rule = AfHelper::getTargeting($event->dbtable,$event->afRule->id);
         $class = AfHelper::getTableClass($event->dbtable);
         $obj = $class::find($event->dbkey);

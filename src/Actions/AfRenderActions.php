@@ -389,7 +389,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
     }
 
 
-    public function getFeedUnreadCount()
+    public function getFeedUnreadCount($date = null)
     {
         if (!$this->id_user) {
             $this->id_user = auth()->user()->id;
@@ -399,13 +399,21 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             return 0;
         }
 
+        if (isset(auth()->user()->admin) and auth()->user()->admin) {
+            $query = AfNotification::where('id_user_recipient', '=', $this->id_user)->where('read',0);
+            if(!empty($date)) {
+                $query->where('af_notifications.created_at','>',$date);
+            }
+            return $query->count();
+        }
+
         return AfNotification::where('id_user_recipient', '=', $this->id_user)
             ->where('read', '=', 0)
             ->count();
     }
 
 
-    public function getFeed($unread_only = true, $with_template = false, $from = 0, $to = 100)
+    public function getFeed($unread_only = true, $with_template = false, $from = 0, $to = 100, $date = null)
     {
         if (!$this->id_user) {
             $this->id_user = auth()->user()->id;
@@ -426,26 +434,22 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
 
         if (isset(auth()->user()->admin) and auth()->user()->admin) {
+            $get_query = AfNotification::where('id_user_recipient', '=', $this->id_user)
+                ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
+                ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
+                ->select('af_notifications.*','af_rules.id_template');
             if ($unread_only) {
-                $query = AfNotification::where('id_user_recipient', '=', $this->id_user)->orWhere('af_rules.to_admins', '=', 1)
-                    ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
-                    ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
-                    ->where('read', '=', 0)
-                    ->orderBy('af_notifications.id', 'DESC')
-                    ->groupBy('af_notifications.id')
-                    ->offset($from)
-                    ->limit($to)
-                    ->get();
-            } else {
-                $query = AfNotification::where('id_user_recipient', '=', $this->id_user)->orWhere('af_rules.to_admins', '=', 1)
-                    ->with(['afRule', 'recipient', 'creator', 'afRule.afEvent', 'afRule.afTemplate', 'afEvent'])
-                    ->join('af_rules', 'af_notifications.id_rule', '=', 'af_rules.id')
-                    ->orderBy('af_notifications.id', 'DESC')
-                    ->groupBy('af_notifications.id')
-                    ->offset($from)
-                    ->limit($to)
-                    ->get();
+                $get_query->where('read',0);
             }
+            if(!empty($date)) {
+                $get_query->where('af_notifications.created_at','>',$date);
+            }
+            $query = $get_query->orderBy('af_notifications.id', 'desc')
+                ->orderBy('af_notifications.id', 'desc')
+                ->groupBy('af_notifications.id')
+                ->offset($from)
+                ->limit($to)
+                ->get();
         } else {
             if ($unread_only) {
                 $query = AfNotification::where('id_user_recipient', '=', $this->id_user)
@@ -517,6 +521,13 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                 $config['link'] = str_replace('{id}', $item->afEvent->dbkey, $config['link']);
             } else {
                 $config['link'] = '';
+            }
+
+            if(!empty($msg)) {
+                $keys = $this->extractReplacementParts($msg);
+                if ($item->relations['creator'] && in_array('creator', $keys)) {
+                    $config['short_message'] = str_replace('{{$creator}}', $item->relations['creator']->name, $config['short_message']);
+                }
             }
 
             if ($obj) {
