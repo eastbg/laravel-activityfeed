@@ -48,7 +48,9 @@ class AfPollAction extends Model
 
             try {
                 $this->handleEvent($record);
-                $this->addToAdmins($record);
+                if($record->afRule->to_admins) {
+                    $this->addToAdmins($record);
+                }
             } catch (\Throwable $exception) {
                 Log::error('AF-NOTIFY: failed to handle event ' . $exception->getMessage());
             }

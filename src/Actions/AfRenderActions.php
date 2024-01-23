@@ -528,6 +528,9 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                 if ($item->relations['creator'] && in_array('creator', $keys)) {
                     $config['short_message'] = str_replace('{{$creator}}', $item->relations['creator']->name, $config['short_message']);
                 }
+                if (in_array('contact', $keys) && $item->afEvent->field) {
+                    $config['short_message'] = str_replace('{{$contact}}', $item->afEvent->field, $config['short_message']);
+                }
             }
 
             if ($obj) {

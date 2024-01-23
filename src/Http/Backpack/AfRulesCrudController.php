@@ -243,7 +243,7 @@ class AfRulesCrudController extends CrudController
 
     private function tabTargeting()
     {
-        $this->crud->field('to_admins')->type('checkbox')->label('Add to admins')->hint('Whether this notification is shown to admins.')->tab('Targeting');
+        $this->crud->field('to_admins')->type('checkbox')->label('Add to admins only')->hint('Whether this notification is shown only to admins.')->tab('Targeting');
 
         $this->crud->addField(
             [   // radio

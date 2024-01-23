@@ -22,6 +22,7 @@ class AfNotifyHelper extends Model
     private $dbfield;
     private $dbkey;
     private $extra_html;
+    private $field;
 
     public function add(string $rule_slug) : bool{
 
@@ -40,6 +41,7 @@ class AfNotifyHelper extends Model
         $obj->id_rule = $rule->id;
         $obj->dbfield = $this->dbfield ?: $rule->field_name;
         $obj->html = $this->extra_html;
+        $obj->field = $this->field;
 
         try {
             $obj->save();
@@ -112,7 +114,15 @@ class AfNotifyHelper extends Model
         return $this;
     }
 
-
+    /**
+     * @param mixed $field
+     * @return AfNotifyHelper
+     */
+    public function setField(string $field) : AfNotifyHelper
+    {
+        $this->field = $field;
+        return $this;
+    }
 }
 
 
