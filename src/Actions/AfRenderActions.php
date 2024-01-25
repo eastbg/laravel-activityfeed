@@ -531,6 +531,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                 if (in_array('contact', $keys) && $item->afEvent->field) {
                     $config['short_message'] = str_replace('{{$contact}}', $item->afEvent->field, $config['short_message']);
                 }
+                $msg = $config['short_message'];
             }
 
             if ($obj) {
