@@ -75,13 +75,29 @@ trait AfTraitNotificationAdd
 
         $last = array_pop($relation_rules);
         $output = [];
+        $items = [];
 
         foreach($relation_rules as $rule){
-            $object = $object->{$rule};
+            if(is_a($object, 'Illuminate\Database\Eloquent\Collection')) {
+                foreach ($object as $item) {
+                    $rule_result = $item->{$rule};
+                    if(is_a($rule_result, 'Illuminate\Database\Eloquent\Collection')) {
+                        foreach($rule_result as $res) {
+                            $items[] = $res;
+                        }
+                    } else {
+                        $items[] = $rule_result;
+                    }
+                }
+            } else {
+                $object = $object->{$rule};
+            }
         }
 
-        foreach($object as $item){
-            if(isset($item->{$last})){
+        $result = !empty($items) ? $items : $object;
+
+        foreach ($result as $item) {
+            if (isset($item->{$last})) {
                 $output[] = $item->{$last};
             }
         }
