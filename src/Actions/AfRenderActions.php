@@ -356,7 +356,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
         $vars = [
             'user' => $notification->recipient,
             'creator' => $notification->creator,
-            'notification' => $notification
+            'notification' => $notification,
+            'field' => $notification->afEvent->field
         ];
 
         $baseobj = $this->getEventRecord($notification->afEvent);
