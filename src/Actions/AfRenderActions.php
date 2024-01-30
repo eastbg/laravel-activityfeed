@@ -357,7 +357,8 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
             'user' => $notification->recipient,
             'creator' => $notification->creator,
             'notification' => $notification,
-            'field' => $notification->afEvent->field
+            'field' => $notification->afEvent->field,
+            'domain' => env('APP_URL') ?? '' ,
         ];
 
         $baseobj = $this->getEventRecord($notification->afEvent);
