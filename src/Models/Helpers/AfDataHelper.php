@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AfDataHelper extends Model
 {
@@ -273,6 +274,10 @@ class AfDataHelper extends Model
                 $rule->save();
             }
         }
+
+        $message = 'Template (rule) with slug "'.$template->slug.'" have been disabled!';
+        $subject = 'Failed notifications and emails';
+        self::sendErrorsEmail($message,$subject);
     }
 
     private function getFiles(string $directory, array $exclusions = [])
@@ -298,7 +303,21 @@ class AfDataHelper extends Model
 
     }
 
+    public function sendErrorsEmail($message,$subject='ActivityFeed Errors')
+    {
+        $email['to_email'] = env('MAIL_FROM_ADDRESS') ?? '';
+        $email['from_email'] = env('MAIL_FROM_ADDRESS') ?? '';
+        $email['subject'] = $subject;
 
+        if($message && $email['to_email'] && $email['from_email']) {
+            Mail::html($message, function ($message) use ($email) {
+                $message
+                    ->to($email['to_email'])
+                    ->from($email['from_email'])
+                    ->subject($email['subject']);
+            });
+        }
+    }
 }
 
 
