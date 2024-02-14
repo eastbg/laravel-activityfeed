@@ -505,7 +505,7 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
 
             $obj = $this->getEventRecord($item->afEvent);
 
-            if (isset(auth()->user()->admin) and auth()->user()->admin and $item->id_user_recipient != auth()->user()->id) {
+            if (isset(auth()->user()->admin) and auth()->user()->admin and $item->id_user_recipient == auth()->user()->id) {
                 $msg = $item->afRule->afTemplate->admin_template;
             } else {
                 $msg = $item->afRule->afTemplate->notification_template;
