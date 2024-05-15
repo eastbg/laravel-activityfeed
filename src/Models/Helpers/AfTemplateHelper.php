@@ -33,14 +33,14 @@ class AfTemplateHelper extends Model
         }
     }
 
-    public function compileTemplates(){
-
-        if(Cache::get('af_template_files')){ return true; }
-
+    public function compileTemplates()
+    {
         $path = resource_path('views/vendor/activity-feed');
 
         if(!is_dir($path)){
             @mkdir($path,0777,true);
+        } else {
+            if(Cache::get('af_template_files')){ return true; }
         }
 
         $templates = AfTemplate::where('enabled','=',1)->get();

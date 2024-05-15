@@ -299,12 +299,6 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
     {
         $output = '';
 
-        $path = resource_path('views/vendor/activity-feed');
-
-        if(!is_dir($path)){
-            AfTemplating::compileTemplates();
-        }
-
         try {
             $output = view('vendor.activity-feed.' . $template->id . '.' . $type . 'notification', $vars)->render();
         } catch (\Throwable $exception) {
