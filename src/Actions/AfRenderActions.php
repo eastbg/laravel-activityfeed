@@ -28,6 +28,7 @@ class AfRenderActions extends Model
     public $random;
     public $id_user;
     public $cache;
+    public $errors;
 
     public $id_template;
 
@@ -40,6 +41,8 @@ class AfRenderActions extends Model
         if (!$this->cache->random) {
             $this->cache->random = rand(12, 239329329329);
         }
+
+        $this->errors = Cache::has('errors') ? Cache::get('errors') : [];
 
         parent::__construct($attributes);
     }
@@ -71,8 +74,13 @@ class AfRenderActions extends Model
                     try {
                         $value = $value->$column;
                     } catch (\Throwable $exception) {
-                        AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template.
-Please note, that the base class here is ' . $baseobj::class . ' . ' . $exception->getMessage(), false);
+                        $value = ' (deleted record) ';
+                        if (!in_array($data, $this->errors)) {
+                            AfHelper::addTemplateError($this->id_template, 'You have incorrectly defined relations in this template.
+        Please note, that the base class here is ' . $baseobj::class . ' . ' . $exception->getMessage(), false);
+                            $this->errors[] = $data;
+                            Cache::set('errors', $this->errors);
+                        }
                     }
                 }
 
@@ -543,6 +551,9 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                     $config['short_message'] = str_replace($key, $v, $config['short_message']);
                 }
             } elseif ($msg) {
+                if (strpos($msg, '{{') !== false && strpos($msg, '}}') !== false) {
+                    $msg = preg_replace('/\{\{.*?\}\}/', ' (deleted record) ', $msg);
+                }
                 $config['short_message'] = $msg;
             } else {
                 $config['short_message'] = 'Notification template missing!';
@@ -577,9 +588,13 @@ Please note, that the base class here is ' . $class . ' . ' . $exception->getMes
                         ->first();
 
                 } catch (\Throwable $exception) {
-                    AfHelper::addTemplateError($event->afRule->afTemplate->id, 'You have incorrectly defined relations in this template.
-Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
-
+                    $data = $event->dbtable.'-'.$event->dbkey;
+                    if (!in_array($data, $this->errors)) {
+                        AfHelper::addTemplateError($event->afRule->afTemplate->id, 'You have incorrectly defined relations in this template.
+    Please note, that the base class here is ' . $class . '. ' . $exception->getMessage());
+                        $this->errors[] = $data;
+                        Cache::set('errors', $this->errors);
+                    }
                     $obj = $class::find($event->dbkey);
                 }
             }
