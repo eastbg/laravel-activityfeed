@@ -262,20 +262,22 @@ class AfDataHelper extends Model
 
         $template = AfTemplate::find($id);
         $string = $disable_rules ? 'Your template and all rules using this template have been disabled. ' : '';
-        $template->error = $string.$error;
-        $template->enabled = 0;
-        $template->save();
+//        comment disabling template and rule
+
+//        $template->error = $string.$error;
+//        $template->enabled = 0;
+//        $template->save();
 
 
-        if($disable_rules){
-            $rules = AfRule::where('id_template','=',$id)->get();
-            foreach($rules as $rule){
-                $rule->enabled = 0;
-                $rule->save();
-            }
-        }
+//        if($disable_rules){
+//            $rules = AfRule::where('id_template','=',$id)->get();
+//            foreach($rules as $rule){
+//                $rule->enabled = 0;
+//                $rule->save();
+//            }
+//        }
 
-        $message = 'Template (rule) with slug "'.$template->slug.'" have been disabled!';
+        $message = 'Template (rule) with slug "'.$template->slug.'" have an error: '.$string.$error;
         $subject = 'Failed notifications and emails';
         self::sendErrorsEmail($message,$subject);
     }
